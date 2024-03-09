@@ -1,8 +1,8 @@
 # Trafiklab-Sl
 
-![version](https://img.shields.io/pypi/v/trafiklab-sl)
-![python version](https://img.shields.io/pypi/pyversions/trafiklab-sl)
-![license](https://img.shields.io/github/license/necrokote/trafiklab-sl)
+[![version](https://img.shields.io/pypi/v/trafiklab-sl)](https://pypi.org/project/trafiklab-sl)
+[![python version](https://img.shields.io/pypi/pyversions/trafiklab-sl)](https://github.com/NecroKote/trafiklab-sl)
+[![license](https://img.shields.io/github/license/necrokote/trafiklab-sl)](https://github.com/NecroKote/trafiklab-sl/blob/main/LICENSE.txt)
 
 A data model for Storstockholms Lokaltrafik (SL) data.
 
