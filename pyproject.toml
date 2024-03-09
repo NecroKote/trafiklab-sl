@@ -29,6 +29,10 @@ dependencies = [
     "dataclasses_json",
 ]
 
+[project.urls]
+Repository = "https://github.com/NecroKote/trafiklab-sl"
+Issues = "https://github.com/NecroKote/trafiklab-sl/issues"
+
 [project.optional-dependencies]
 dev = [
     "wheel",

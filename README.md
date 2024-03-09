@@ -1,5 +1,9 @@
 # Trafiklab-Sl
 
+![version](https://img.shields.io/pypi/v/trafiklab-sl)
+![python version](https://img.shields.io/pypi/pyversions/trafiklab-sl)
+![license](https://img.shields.io/github/license/necrokote/trafiklab-sl)
+
 A data model for Storstockholms Lokaltrafik (SL) data.
 
 Also contains an async client for fetching data from the [Trafiklab API](https://www.trafiklab.se/api/).
