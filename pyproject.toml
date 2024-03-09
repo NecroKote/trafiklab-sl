@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "trafiklab-sl"
+version = "0.1.0"
+description = "Client for SL data via Trafiklab API"
+authors = [
+    {name="Mikalai Kukhta", email="mikalai.kukhta@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.11.0"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+]
+keywords = [
+    "SL",
+    "Storstockholms Lokaltrafik",
+    "Trafiklab"
+]
+dependencies = [
+    "aiohttp",
+    "dataclasses_json",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest==8.0.0",
+    "pytest-asyncio==0.23.5",
+]
+
+[tool.setuptools.packages.find]
+exclude = ["tests*"]
+namespaces = false
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
