@@ -9,7 +9,7 @@ wheel:
 	python -m build --wheel
 
 build/venv:
-	.venv/bin/python -m build --wheel --no-isolation
+	.venv/bin/python -m build --no-isolation
 
 test:
 	python -m pytest
