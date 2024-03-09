@@ -4,17 +4,17 @@ https://www.trafiklab.se/api/trafiklab-apis/sl/deviations
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, List, Optional, Self
+from typing import List, Optional
 
 from dataclasses_json import DataClassJsonMixin
 
-from .common import TransportMode, dt_field
+from .common import SL_TZ, TransportMode, dt_field
 
 
 @dataclass(frozen=True)
 class Publish(DataClassJsonMixin):
-    from_: datetime = dt_field(alias="from")
-    upto: Optional[datetime] = dt_field(default=None)
+    from_: datetime = dt_field(alias="from", tzinfo=SL_TZ)
+    upto: Optional[datetime] = dt_field(default=None, tzinfo=SL_TZ)
 
 
 @dataclass(frozen=True)
@@ -71,10 +71,10 @@ class Deviation(DataClassJsonMixin):
     """information regarding deviations on SLs transport network."""
 
     version: int
-    created: datetime = dt_field()
+    created: datetime = dt_field(tzinfo=SL_TZ)
     publish: Publish
     priority: Priority
     message_variants: List[MessageVariant]
-    modified: Optional[datetime] = dt_field(default=None)
+    modified: Optional[datetime] = dt_field(default=None, tzinfo=SL_TZ)
     deviation_case_id: Optional[int] = None
     scope: Optional[Scope] = None

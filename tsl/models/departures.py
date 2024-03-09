@@ -1,14 +1,14 @@
 from dataclasses import dataclass
 from datetime import datetime
-from enum import StrEnum
+from enum import Enum
 from typing import List, Optional
 
 from dataclasses_json import DataClassJsonMixin
 
-from .common import TransportMode, dt_field
+from .common import SL_TZ, TransportMode, dt_field
 
 
-class DepartureState(StrEnum):
+class DepartureState(str, Enum):
     NOTEXPECTED = "NOTEXPECTED"
     NOTCALLED = "NOTCALLED"
     EXPECTED = "EXPECTED"
@@ -24,7 +24,7 @@ class DepartureState(StrEnum):
     ASSUMEDDEPARTED = "ASSUMEDDEPARTED"
 
 
-class JourneyState(StrEnum):
+class JourneyState(str, Enum):
     # Do not show departure at all. Some systems might instead indicate that this departure is available only if ordered
     NOTEXPECTED = "NOTEXPECTED"
 
@@ -71,13 +71,13 @@ class JourneyState(StrEnum):
     ASSUMEDCOMPLETED = "ASSUMEDCOMPLETED"
 
 
-class JourneyPredictionState(StrEnum):
+class JourneyPredictionState(str, Enum):
     NORMAL = "NORMAL"
     LOSTCONTACT = "LOSTCONTACT"
     UNRELIABLE = "UNRELIABLE"
 
 
-class JourneyPassengerLevel(StrEnum):
+class JourneyPassengerLevel(str, Enum):
     EMPTY = "EMPTY"
     SEATSAVAILABLE = "SEATSAVAILABLE"
     STANDINGPASSENGERS = "STANDINGPASSENGERS"
@@ -85,7 +85,7 @@ class JourneyPassengerLevel(StrEnum):
     UNKNOWN = "UNKNOWN"
 
 
-class StopAreaType(StrEnum):
+class StopAreaType(str, Enum):
     BUSTERM = "BUSTERM"
     METROSTN = "METROSTN"
     TRAMSTN = "TRAMSTN"
@@ -146,8 +146,8 @@ class Departure(DataClassJsonMixin):
     stop_point: StopPointReference
     line: LineReference
     deviations: List[DepartureDeviation]
-    scheduled: datetime = dt_field()
-    expected: Optional[datetime] = dt_field()
+    scheduled: datetime = dt_field(tzinfo=SL_TZ)
+    expected: Optional[datetime] = dt_field(tzinfo=SL_TZ)
     via: Optional[str] = None
     destination: Optional[str] = None
 

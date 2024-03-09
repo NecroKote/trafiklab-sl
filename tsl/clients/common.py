@@ -1,4 +1,4 @@
-from typing import Any, Callable, NamedTuple
+from typing import Any, Callable, NamedTuple, Optional
 
 import aiohttp
 
@@ -11,7 +11,7 @@ class UrlParams(NamedTuple):
 
 
 class AsyncClient:
-    def __init__(self, get_session: SessionFactory | None = None) -> None:
+    def __init__(self, get_session: Optional[SessionFactory] = None) -> None:
         self._get_session = get_session
 
     @property

@@ -46,7 +46,7 @@ class DeviationsClient(AsyncClient):
         line: Optional[List[str]] = None,
         transport_authority: Optional[int] = None,
         transport_mode: Optional[TransportMode] = None,
-        session: aiohttp.ClientSession | None = None,
+        session: Optional[aiohttp.ClientSession] = None,
     ) -> List[Deviation]:
 
         args = self.get_request_url_params(

@@ -49,7 +49,7 @@ class TransportClient(AsyncClient):
         direction: Optional[int] = None,
         line: Optional[int] = None,
         forecast: int = 60,
-        session: aiohttp.ClientSession | None = None,
+        session: Optional[aiohttp.ClientSession] = None,
     ) -> SiteDepartureResponse:
         args = self.get_departures_url_params(
             site_id, transport, direction, line, forecast
