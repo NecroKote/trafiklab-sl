@@ -35,7 +35,7 @@ class DeviationsClient(AsyncClient):
         if transport_authority is not None:
             params["transport_authority"] = transport_authority
         if transport_mode is not None:
-            params["transport_mode"] = ",".join((x.value for x in transport_mode))
+            params["transport_mode"] = transport_mode.value
 
         return UrlParams("https://deviations.integration.sl.se/v1/messages", params)
 
