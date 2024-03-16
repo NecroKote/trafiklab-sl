@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Optional
 from urllib.parse import quote
 
 import aiohttp
@@ -30,7 +30,7 @@ class TransportClient(AsyncClient):
             "https://transport.integration.sl.se"
             f"/v1/sites/{quote(str(site_id))}/departures"
         )
-        params = {}
+        params: dict[str, Any] = {}
         if transport is not None:
             params["transport"] = transport.value
         if direction is not None:

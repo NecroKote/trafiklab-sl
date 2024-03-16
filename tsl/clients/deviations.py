@@ -21,21 +21,21 @@ class DeviationsClient(AsyncClient):
         site: Optional[List[int]] = None,
         line: Optional[List[str]] = None,
         transport_authority: Optional[int] = None,
-        transport_mode: Optional[TransportMode] = None,
+        transport_mode: Optional[List[TransportMode]] = None,
     ) -> UrlParams:
         """returns url and params to request deviations"""
 
-        params = {}
+        params: list[tuple[str, str]] = []
         if future is not None:
-            params["future"] = future
+            params.append(("future", "true" if future else "false"))
         if site is not None:
-            params["site"] = ",".join((str(x) for x in site))
+            params.extend(("site", str(x)) for x in site)
         if line is not None:
-            params["line"] = ",".join((x for x in line))
+            params.extend(("line", str(x)) for x in line)
         if transport_authority is not None:
-            params["transport_authority"] = transport_authority
+            params.append(("transport_authority", str(transport_authority)))
         if transport_mode is not None:
-            params["transport_mode"] = transport_mode.value
+            params.extend(("transport_mode", x.value) for x in transport_mode)
 
         return UrlParams("https://deviations.integration.sl.se/v1/messages", params)
 
@@ -45,7 +45,7 @@ class DeviationsClient(AsyncClient):
         site: Optional[List[int]] = None,
         line: Optional[List[str]] = None,
         transport_authority: Optional[int] = None,
-        transport_mode: Optional[TransportMode] = None,
+        transport_mode: Optional[List[TransportMode]] = None,
         session: Optional[aiohttp.ClientSession] = None,
     ) -> List[Deviation]:
 

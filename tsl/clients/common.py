@@ -1,4 +1,4 @@
-from typing import Any, Callable, NamedTuple, Optional
+from typing import Any, Callable, Dict, List, NamedTuple, Optional, Tuple, Union
 
 import aiohttp
 
@@ -7,7 +7,7 @@ SessionFactory = Callable[[], aiohttp.ClientSession]
 
 class UrlParams(NamedTuple):
     url: str
-    params: dict[str, Any]
+    params: Union[List[Tuple[str, str]], Dict[str, Any], None]
 
 
 class AsyncClient:
