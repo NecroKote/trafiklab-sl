@@ -4,6 +4,7 @@ from urllib.parse import quote
 import aiohttp
 
 from tsl.models.departures import SiteDepartureResponse, TransportMode
+from tsl.models.sites import Site
 
 from .common import AsyncClient, UrlParams
 
@@ -62,3 +63,16 @@ class TransportClient(AsyncClient):
                 response = await self._request_json(new_session, args)
 
         return SiteDepartureResponse.schema().load(response)
+
+    async def get_sites(self, session: Optional[aiohttp.ClientSession] = None):
+        """List all sites within Region Stockholm"""
+
+        args = UrlParams("https://transport.integration.sl.se/v1/sites", None)
+
+        if session:
+            response = await self._request_json(session, args)
+        else:
+            async with self.session as new_session:
+                response = await self._request_json(new_session, args)
+
+        return Site.schema().load(response, many=True)

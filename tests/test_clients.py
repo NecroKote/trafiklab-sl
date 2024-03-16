@@ -4,6 +4,7 @@ from tsl.clients.deviations import DeviationsClient
 from tsl.clients.transport import TransportClient
 from tsl.models.departures import Departure, SiteDepartureResponse
 from tsl.models.deviations import Deviation, TransportMode
+from tsl.models.sites import Site
 
 
 @pytest.mark.integration
@@ -32,3 +33,13 @@ async def test_transport_departures():
     # serialization loop
     raw = SiteDepartureResponse.schema().dumps(response)
     SiteDepartureResponse.schema().loads(raw)
+
+
+@pytest.mark.integration
+async def test_transport_sites():
+    cl = TransportClient()
+    sites = await cl.get_sites()
+
+    # serialization loop
+    raw = Site.schema().dumps(sites, many=True)
+    Site.schema().loads(raw, many=True)
