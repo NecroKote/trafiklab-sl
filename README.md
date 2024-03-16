@@ -18,7 +18,7 @@ To install the package for development, clone the repository and run:
 ```shell
 python -m venv .venv
 source .venv/bin/activate
-pip install -e '.[dev]'
+pip install -e '.[dev,test]'
 ```
 
 ## Usage
@@ -26,7 +26,7 @@ pip install -e '.[dev]'
 The client is based on the `aiohttp` library and is async. It is used to fetch data from the Trafiklab API.
 The library supports two SL APIs:
 - [SL Deviatons API](https://www.trafiklab.se/api/trafiklab-apis/sl/deviations/)
-- [SL Transport API](https://www.trafiklab.se/api/trafiklab-apis/sl/transport/) - just "Departures from Site" for now
+- [SL Transport API](https://www.trafiklab.se/api/trafiklab-apis/sl/transport/) - just "Departures from Site" and "Sites" for now
 
 More APIs will be added in the future.
 

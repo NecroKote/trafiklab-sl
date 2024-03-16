@@ -16,7 +16,7 @@ class TransportClient(AsyncClient):
     client for SL Transport API
     https://www.trafiklab.se/api/trafiklab-apis/sl/transport/
 
-    only departures are supported at the moment
+    only departures and sites are supported at the moment
     """
 
     @staticmethod
@@ -52,6 +52,11 @@ class TransportClient(AsyncClient):
         forecast: int = 60,
         session: Optional[aiohttp.ClientSession] = None,
     ) -> SiteDepartureResponse:
+        """
+        Get upcoming departures and deviations starting from time of
+        the request (a maximum of 3 departures for each line & direction)
+        """
+
         args = self.get_departures_url_params(
             site_id, transport, direction, line, forecast
         )
