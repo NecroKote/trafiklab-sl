@@ -1,9 +1,8 @@
 from typing import Any, Optional
 from urllib.parse import quote
 
-from tsl.models.departures import SiteDepartureResponse, TransportMode
-from tsl.models.sites import Site
-
+from ..models.departures import SiteDepartureResponse, TransportMode
+from ..models.sites import Site
 from .common import AsyncClient, UrlParams
 
 __all__ = ("TransportClient",)

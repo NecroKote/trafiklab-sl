@@ -28,6 +28,8 @@ async def test_deviations(session):
 
     # serialization loop
     raw = Deviation.schema().dumps(deviations, many=True)
+    # ... with extra data to be ignored
+    raw = raw[:-2] + ', "extra": "data"}]'
     Deviation.schema().loads(raw, many=True)
 
 
@@ -43,6 +45,8 @@ async def test_transport_departures(session):
 
     # serialization loop
     raw = SiteDepartureResponse.schema().dumps(response)
+    # ... with extra data to be ignored
+    raw = raw[:-1] + ', "extra": "data"}'
     SiteDepartureResponse.schema().loads(raw)
 
 
@@ -53,6 +57,8 @@ async def test_transport_sites(session):
 
     # serialization loop
     raw = Site.schema().dumps(sites, many=True)
+    # ... with extra data to be ignored
+    raw = raw[:-2] + ', "extra": "data"}]'
     Site.schema().loads(raw, many=True)
 
 
@@ -63,4 +69,6 @@ async def test_stop_lookup(session):
 
     # serialization loop
     raw = Stop.schema().dumps(stops, many=True)
+    # ... with extra data to be ignored
+    raw = raw[:-2] + ', "extra": "data"}]'
     Stop.schema().loads(raw, many=True)

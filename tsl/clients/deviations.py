@@ -1,7 +1,6 @@
 from typing import List, Optional
 
-from tsl.models.deviations import Deviation, TransportMode
-
+from ..models.deviations import Deviation, TransportMode
 from .common import AsyncClient, UrlParams
 
 __all__ = ("DeviationsClient",)
