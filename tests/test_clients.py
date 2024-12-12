@@ -1,10 +1,14 @@
+import os
+
 import pytest
 
 from tsl.clients.deviations import DeviationsClient
+from tsl.clients.stoplookup import StopLookupClient
 from tsl.clients.transport import TransportClient
 from tsl.models.departures import Departure, SiteDepartureResponse
 from tsl.models.deviations import Deviation, TransportMode
 from tsl.models.sites import Site
+from tsl.models.stops import Stop
 
 
 @pytest.mark.integration
@@ -43,3 +47,13 @@ async def test_transport_sites():
     # serialization loop
     raw = Site.schema().dumps(sites, many=True)
     Site.schema().loads(raw, many=True)
+
+
+@pytest.mark.integration
+async def test_stop_lookup():
+    cl = StopLookupClient(os.environ["SL_LOOKUP_API_KEY"])
+    stops = await cl.get_stops("Oden")
+
+    # serialization loop
+    raw = Stop.schema().dumps(stops, many=True)
+    Stop.schema().loads(raw, many=True)
