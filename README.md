@@ -24,9 +24,11 @@ pip install -e '.[dev,test]'
 ## Usage
 
 The client is based on the `aiohttp` library and is async. It is used to fetch data from the Trafiklab API.
-The library supports two SL APIs:
+The library supports following SL APIs:
 - [SL Deviatons API](https://www.trafiklab.se/api/trafiklab-apis/sl/deviations/)
-- [SL Transport API](https://www.trafiklab.se/api/trafiklab-apis/sl/transport/) - just "Departures from Site" and "Sites" for now
+- [SL Transport API](https://www.trafiklab.se/api/trafiklab-apis/sl/transport/)
+  - "Departures from Site"
+  - "Sites"
 - [SL Stop lookup API](https://www.trafiklab.se/api/trafiklab-apis/sl/stop-lookup/)
 
 More APIs will be added in the future.
@@ -37,6 +39,7 @@ Here is an example of how to use the client to get upcoming train departures at 
 
 ```python
 import asyncio
+import aiohttp
 
 from tsl.clients.stoplookup import StopLookupClient
 from tsl.clients.transport import TransportClient
@@ -44,18 +47,20 @@ from tsl.models.common import TransportMode
 
 
 async def main():
-    # perform stop lookup to get the site id for Stockholm Central
-    lookup_client = StopLookupClient("your-SL-Platsuppslag-api-key")
-    stops = await lookup_client.get_stops("Stockholm Central")
-    if (central_station := next(iter(stops), None)) is None:
-        raise RuntimeError(r"Could not find Stockholm Central. Weird ¯\_(ツ)_/¯")
+    async with aiohttp.ClientSession() as session:
 
-    # get the transport API site id for Stockholm Central
-    transport_api_siteid = central_station.SiteId.transport_siteid
+        # perform stop lookup to get the site id for Stockholm Central
+        lookup_client = StopLookupClient("your-SL-Platsuppslag-api-key", session)
+        stops = await lookup_client.get_stops("Stockholm Central")
+        if (central_station := next(iter(stops), None)) is None:
+            raise RuntimeError(r"Could not find Stockholm Central. Weird ¯\_(ツ)_/¯")
 
-    # get upcoming train departures
-    client = TransportClient()
-    reponse = await client.get_site_departures(transport_api_siteid, transport=TransportMode.TRAIN)
+        # get the transport API site id for Stockholm Central
+        transport_api_siteid = central_station.SiteId.transport_siteid
+
+        # get upcoming train departures
+        client = TransportClient(session)
+        reponse = await client.get_site_departures(transport_api_siteid, transport=TransportMode.TRAIN)
 
     print(f"Upcoming trains at {central_station.Name}:")
     for departure in sorted(reponse.departures, key=lambda d: d.expected):

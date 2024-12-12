@@ -12,12 +12,12 @@ class StopLookupClient(AsyncClient):
     https://www.trafiklab.se/api/trafiklab-apis/sl/stop-lookup/
     """
 
-    def __init__(self, api_key: str):
+    def __init__(self, api_key: str, session: aiohttp.ClientSession):
         """
         :param api_key: the "SL Platsuppslag" API key
         """
 
-        super().__init__()
+        super().__init__(session)
         self._api_key = api_key
 
     @staticmethod
@@ -46,24 +46,13 @@ class StopLookupClient(AsyncClient):
             params,
         )
 
-    async def get_stops(
-        self,
-        search_string: str,
-        max_results: int = 10,
-        session: Optional[aiohttp.ClientSession] = None,
-    ) -> List[Stop]:
+    async def get_stops(self, search_string: str, max_results: int = 10) -> List[Stop]:
         """
         Get stops by search string
         """
 
         args = self.get_request_url_params(self._api_key, search_string, max_results)
-
-        if session:
-            response = await self._request_json(session, args)
-        else:
-            async with self.session as new_session:
-                response = await self._request_json(new_session, args)
-
+        response = await self._request_json(args)
         data = response["ResponseData"]
 
         return Stop.schema().load(data, many=True)

@@ -1,5 +1,6 @@
 import os
 
+import aiohttp
 import pytest
 
 from tsl.clients.deviations import DeviationsClient
@@ -11,9 +12,15 @@ from tsl.models.sites import Site
 from tsl.models.stops import Stop
 
 
+@pytest.fixture
+async def session():
+    async with aiohttp.ClientSession() as session:
+        yield session
+
+
 @pytest.mark.integration
-async def test_deviations():
-    cl = DeviationsClient()
+async def test_deviations(session):
+    cl = DeviationsClient(session)
     deviations = await cl.get_deviations(
         line=["10", "43"],
         transport_mode=[TransportMode.METRO, TransportMode.TRAIN],
@@ -25,8 +32,8 @@ async def test_deviations():
 
 
 @pytest.mark.integration
-async def test_transport_departures():
-    cl = TransportClient()
+async def test_transport_departures(session):
+    cl = TransportClient(session)
     response = await cl.get_site_departures(1002)
 
     assert isinstance(response, SiteDepartureResponse)
@@ -40,8 +47,8 @@ async def test_transport_departures():
 
 
 @pytest.mark.integration
-async def test_transport_sites():
-    cl = TransportClient()
+async def test_transport_sites(session):
+    cl = TransportClient(session)
     sites = await cl.get_sites()
 
     # serialization loop
@@ -50,8 +57,8 @@ async def test_transport_sites():
 
 
 @pytest.mark.integration
-async def test_stop_lookup():
-    cl = StopLookupClient(os.environ["SL_LOOKUP_API_KEY"])
+async def test_stop_lookup(session):
+    cl = StopLookupClient(os.environ["SL_LOOKUP_API_KEY"], session)
     stops = await cl.get_stops("Oden")
 
     # serialization loop
