@@ -6,26 +6,29 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import List, Optional
 
-from dataclasses_json import DataClassJsonMixin
+from dataclasses_json import DataClassJsonMixin, Undefined, dataclass_json
 
 from .common import SL_TZ, TransportMode, dt_field
 
 
+@dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass(frozen=True)
-class Publish(DataClassJsonMixin):
+class Publish:
     from_: datetime = dt_field(alias="from", tzinfo=SL_TZ)
     upto: Optional[datetime] = dt_field(default=None, tzinfo=SL_TZ)
 
 
+@dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass(frozen=True)
-class Priority(DataClassJsonMixin):
+class Priority:
     importance_level: int
     influence_level: int
     urgency_level: int
 
 
+@dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass(frozen=True)
-class MessageVariant(DataClassJsonMixin):
+class MessageVariant:
     header: str
     details: str
     scope_alias: str
@@ -33,14 +36,16 @@ class MessageVariant(DataClassJsonMixin):
     weblink: Optional[str] = None
 
 
+@dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass(frozen=True)
-class StopPoint(DataClassJsonMixin):
+class StopPoint:
     id: int
     name: str
 
 
+@dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass(frozen=True)
-class ScopeArea(DataClassJsonMixin):
+class ScopeArea:
     id: int
     transport_authority: int
     name: str
@@ -48,8 +53,9 @@ class ScopeArea(DataClassJsonMixin):
     stop_points: Optional[List[StopPoint]] = None
 
 
+@dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass(frozen=True)
-class Line(DataClassJsonMixin):
+class Line:
     id: int
     transport_authority: int
     transport_mode: TransportMode
@@ -58,14 +64,16 @@ class Line(DataClassJsonMixin):
     group_of_lines: Optional[str] = None
 
 
+@dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass(frozen=True)
-class Scope(DataClassJsonMixin):
+class Scope:
     """Entities affected by the deviation"""
 
     stop_areas: Optional[List[ScopeArea]] = None
     lines: Optional[List[Line]] = None
 
 
+@dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass(frozen=True)
 class Deviation(DataClassJsonMixin):
     """information regarding deviations on SLs transport network."""

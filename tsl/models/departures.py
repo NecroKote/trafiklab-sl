@@ -3,7 +3,7 @@ from datetime import datetime
 from enum import Enum
 from typing import List, Optional
 
-from dataclasses_json import DataClassJsonMixin
+from dataclasses_json import DataClassJsonMixin, Undefined, dataclass_json
 
 from .common import SL_TZ, TransportMode, dt_field
 
@@ -97,46 +97,52 @@ class StopAreaType(str, Enum):
     UNKNOWN = "UNKNOWN"
 
 
+@dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass(frozen=True)
-class DepartureJourney(DataClassJsonMixin):
+class DepartureJourney:
     id: int
     state: JourneyState
     prediction_state: Optional[JourneyPredictionState] = None
     passenger_level: Optional[JourneyPassengerLevel] = None
 
 
+@dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass(frozen=True)
-class StopAreaReference(DataClassJsonMixin):
+class StopAreaReference:
     id: int
     name: str
     sname: Optional[str] = None
     type: Optional[StopAreaType] = None
 
 
+@dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass(frozen=True)
-class StopPointReference(DataClassJsonMixin):
+class StopPointReference:
     id: int
     name: Optional[str] = None
     designation: Optional[str] = None
 
 
+@dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass(frozen=True)
-class LineReference(DataClassJsonMixin):
+class LineReference:
     id: int
     designation: Optional[str] = None
     transport_mode: Optional[TransportMode] = None
     group_of_lines: Optional[str] = None
 
 
+@dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass(frozen=True)
-class DepartureDeviation(DataClassJsonMixin):
+class DepartureDeviation:
     importance_level: int
     consequence: str
     message: str
 
 
+@dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass(frozen=True)
-class Departure(DataClassJsonMixin):
+class Departure:
     direction: str
     direction_code: int
     state: DepartureState
@@ -152,22 +158,25 @@ class Departure(DataClassJsonMixin):
     destination: Optional[str] = None
 
 
+@dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass(frozen=True)
-class DeviationScope(DataClassJsonMixin):
+class DeviationScope:
     description: Optional[str] = None
     lines: Optional[List[LineReference]] = None
     stop_areas: Optional[List[StopAreaReference]] = None
     stop_points: Optional[List[StopPointReference]] = None
 
 
+@dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass(frozen=True)
-class StopDeviation(DataClassJsonMixin):
+class StopDeviation:
     id: int
     importance_level: int
     message: str
     scope: DeviationScope
 
 
+@dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass(frozen=True)
 class SiteDepartureResponse(DataClassJsonMixin):
     departures: List[Departure]

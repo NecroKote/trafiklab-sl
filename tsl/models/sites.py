@@ -2,19 +2,21 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import List, Optional
 
-from dataclasses_json import DataClassJsonMixin
+from dataclasses_json import DataClassJsonMixin, Undefined, dataclass_json
 
 from .common import SL_TZ, dt_field
 
 
+@dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass(frozen=True)
-class ValidityPeriod(DataClassJsonMixin):
+class ValidityPeriod:
     """The period for which the object is valid"""
 
     from_: datetime = dt_field(alias="from", tzinfo=SL_TZ)
     to: Optional[datetime] = dt_field(default=None, tzinfo=SL_TZ)
 
 
+@dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass(frozen=True)
 class Site(DataClassJsonMixin):
     # Unique identifier of a site

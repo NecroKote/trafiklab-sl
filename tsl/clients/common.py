@@ -1,8 +1,6 @@
-from typing import Any, Callable, Dict, List, NamedTuple, Optional, Tuple, Union
+from typing import Any, Dict, List, NamedTuple, Tuple, Union
 
 import aiohttp
-
-SessionFactory = Callable[[], aiohttp.ClientSession]
 
 
 class UrlParams(NamedTuple):
@@ -11,18 +9,11 @@ class UrlParams(NamedTuple):
 
 
 class AsyncClient:
-    def __init__(self, get_session: Optional[SessionFactory] = None) -> None:
-        self._get_session = get_session
+    def __init__(self, session: aiohttp.ClientSession) -> None:
+        self._session = session
 
-    @property
-    def session(self):
-        if factory := self._get_session:
-            return factory()
-
-        return aiohttp.ClientSession()
-
-    async def _request_json(self, session: aiohttp.ClientSession, args: UrlParams):
-        response = await session.get(
+    async def _request_json(self, args: UrlParams):
+        response = await self._session.get(
             args.url,
             params=args.params,
             headers={"Content-Type": "application/json"},

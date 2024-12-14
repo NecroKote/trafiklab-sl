@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import List, Optional
 
-from dataclasses_json import DataClassJsonMixin, config
+from dataclasses_json import DataClassJsonMixin, Undefined, config, dataclass_json
 from marshmallow import fields
 
 
@@ -30,6 +30,7 @@ class LookupSiteId(str):
         return value
 
 
+@dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass(frozen=True)
 class Stop(DataClassJsonMixin):
     # The name of the stop generaly known to the public

@@ -1,9 +1,6 @@
 from typing import List, Optional
 
-import aiohttp
-
-from tsl.models.deviations import Deviation, TransportMode
-
+from ..models.deviations import Deviation, TransportMode
 from .common import AsyncClient, UrlParams
 
 __all__ = ("DeviationsClient",)
@@ -46,17 +43,10 @@ class DeviationsClient(AsyncClient):
         line: Optional[List[str]] = None,
         transport_authority: Optional[int] = None,
         transport_mode: Optional[List[TransportMode]] = None,
-        session: Optional[aiohttp.ClientSession] = None,
     ) -> List[Deviation]:
 
         args = self.get_request_url_params(
             future, site, line, transport_authority, transport_mode
         )
-
-        if session:
-            response = await self._request_json(session, args)
-        else:
-            async with self.session as new_session:
-                response = await self._request_json(new_session, args)
-
+        response = await self._request_json(args)
         return Deviation.schema().load(response, many=True)
