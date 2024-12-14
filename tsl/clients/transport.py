@@ -1,11 +1,8 @@
 from typing import Any, Optional
 from urllib.parse import quote
 
-import aiohttp
-
-from tsl.models.departures import SiteDepartureResponse, TransportMode
-from tsl.models.sites import Site
-
+from ..models.departures import SiteDepartureResponse, TransportMode
+from ..models.sites import Site
 from .common import AsyncClient, UrlParams
 
 __all__ = ("TransportClient",)
@@ -50,7 +47,6 @@ class TransportClient(AsyncClient):
         direction: Optional[int] = None,
         line: Optional[int] = None,
         forecast: int = 60,
-        session: Optional[aiohttp.ClientSession] = None,
     ) -> SiteDepartureResponse:
         """
         Get upcoming departures and deviations starting from time of
@@ -61,23 +57,13 @@ class TransportClient(AsyncClient):
             site_id, transport, direction, line, forecast
         )
 
-        if session:
-            response = await self._request_json(session, args)
-        else:
-            async with self.session as new_session:
-                response = await self._request_json(new_session, args)
+        response = await self._request_json(args)
 
         return SiteDepartureResponse.schema().load(response)
 
-    async def get_sites(self, session: Optional[aiohttp.ClientSession] = None):
+    async def get_sites(self):
         """List all sites within Region Stockholm"""
 
         args = UrlParams("https://transport.integration.sl.se/v1/sites", None)
-
-        if session:
-            response = await self._request_json(session, args)
-        else:
-            async with self.session as new_session:
-                response = await self._request_json(new_session, args)
-
+        response = await self._request_json(args)
         return Site.schema().load(response, many=True)
