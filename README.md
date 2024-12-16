@@ -50,7 +50,7 @@ async def main():
     async with aiohttp.ClientSession() as session:
 
         # perform stop lookup to get the site id for Stockholm Central
-        lookup_client = StopLookupClient("your-SL-Platsuppslag-api-key", session)
+        lookup_client = StopLookupClient("your 'Trafikverket öppet API' api key", session)
         stops = await lookup_client.get_stops("Stockholm Central")
         if (central_station := next(iter(stops), None)) is None:
             raise RuntimeError(r"Could not find Stockholm Central. Weird ¯\_(ツ)_/¯")

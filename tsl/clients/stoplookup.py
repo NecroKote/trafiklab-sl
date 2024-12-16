@@ -14,7 +14,7 @@ class StopLookupClient(AsyncClient):
 
     def __init__(self, api_key: str, session: aiohttp.ClientSession):
         """
-        :param api_key: the "SL Platsuppslag" API key
+        :param api_key: the "Trafikverket öppet API" key
         """
 
         super().__init__(session)
