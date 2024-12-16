@@ -10,18 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
-
     steps:
       - uses: actions/checkout@v4
       - name: Install the latest version of uv
         uses: astral-sh/setup-uv@v3
       - name: Install tox
         run: uv tool install --python-preference only-managed --python 3.13 tox --with tox-uv --with tox-gh
-      - name: Install Python
-        if: matrix.python-version != '3.13'
-        run: uv python install --python-preference only-managed ${{ matrix.python-version }}
       - name: Setup test suite
         run: tox run -vv --notest --skip-missing-interpreters false
         env:
