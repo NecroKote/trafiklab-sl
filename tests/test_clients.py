@@ -3,6 +3,7 @@ import os
 import aiohttp
 import pytest
 
+from tsl.clients.common import OperationFailed
 from tsl.clients.deviations import DeviationsClient
 from tsl.clients.stoplookup import StopLookupClient
 from tsl.clients.transport import TransportClient
@@ -64,6 +65,9 @@ async def test_transport_sites(session):
 
 @pytest.mark.integration
 async def test_stop_lookup(session):
+    with pytest.raises(OperationFailed):
+        await StopLookupClient("", session).get_stops("any")
+
     cl = StopLookupClient(os.environ["SL_LOOKUP_API_KEY"], session)
     stops = await cl.get_stops("Oden")
 

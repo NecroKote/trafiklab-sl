@@ -2,7 +2,9 @@
 *.egg-info
 dist
 build
+__pycache__
 
 .venv
 *.json
 .rest
+.env
