@@ -3,7 +3,12 @@ from typing import List
 import aiohttp
 
 from ..models.stops import Stop
-from .common import AsyncClient, UrlParams
+from .common import (
+    AsyncClient,
+    OperationFailed,
+    ResponseFormatChanged,
+    UrlParams,
+)
 
 
 class StopLookupClient(AsyncClient):
@@ -53,6 +58,13 @@ class StopLookupClient(AsyncClient):
 
         args = self.get_request_url_params(self._api_key, search_string, max_results)
         response = await self._request_json(args)
-        data = response["ResponseData"]
+
+        if (code := response.get("StatusCode")) is None:
+            raise ResponseFormatChanged("'StatusCode' not found in response")
+        elif code != 0:
+            raise OperationFailed(code, response["Message"])
+
+        if (data := response.get("ResponseData")) is None:
+            raise ResponseFormatChanged("'ResponseData' not found in response")
 
         return Stop.schema().load(data, many=True)

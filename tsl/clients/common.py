@@ -31,3 +31,20 @@ class AsyncClient:
         response.raise_for_status()
         json = await response.json()
         return json
+
+
+class ClientException(Exception):
+    """Base class for client exceptions"""
+
+
+class ResponseFormatChanged(ClientException):
+    """Raised when the response format has changed"""
+
+
+class OperationFailed(ClientException):
+    """Raised when an operation failed with known error code"""
+
+    def __init__(self, code: int, message: str):
+        self.code = code
+        self.message = message
+        super().__init__(f"{code}: {message}")
