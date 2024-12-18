@@ -31,6 +31,8 @@ class AsyncClient:
             safe_params = params.copy()
         elif isinstance(params, list):
             safe_params = dict(params)
+        else:
+            safe_params = {}
 
         for key in SENSITIVE_PARAMS:
             if key in safe_params:
