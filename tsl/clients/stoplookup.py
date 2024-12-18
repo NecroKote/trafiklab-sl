@@ -4,6 +4,7 @@ import aiohttp
 
 from ..models.stops import Stop
 from .common import (
+    PARAM_KEY,
     AsyncClient,
     OperationFailed,
     ResponseFormatChanged,
@@ -40,7 +41,7 @@ class StopLookupClient(AsyncClient):
             raise ValueError("max_results must be between 1 and 50")
 
         params = [
-            ("key", api_key),
+            (PARAM_KEY, api_key),
             ("searchstring", search_string),
             ("maxresults", str(max_results)),
             ("type", "S"),  # "Stations only"
