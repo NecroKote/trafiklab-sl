@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from dataclasses_json import DataClassJsonMixin, Undefined, config, dataclass_json
 from marshmallow import fields
@@ -25,9 +25,27 @@ class LookupSiteId(str):
         if not (value[0] == "3" and value[3] == "1"):
             raise ValueError("siteid must start with 3 and have 1 as 4th character")
 
+        # 3BA1CDEFG -> ABCDEFG
         value.transport_siteid = int(value[2] + value[1] + value[4:])
 
         return value
+
+    @classmethod
+    def from_siteid(cls, value: Union[str, int]):
+        """
+        Create a LookupSiteId from a siteid
+
+        `value` can be in short and long (3xx1xxxxx) form.
+        """
+
+        value = str(value).lstrip("0")
+
+        if len(value) == 9 and value[0] == "3" and value[3] == "1":
+            return cls(value)
+        else:
+            value = value.zfill(7)
+            # ABCDEFG -> 3BA1CDEFG
+            return cls(f"3{value[1]}{value[0]}1{value[2:]}")
 
 
 @dataclass_json(undefined=Undefined.EXCLUDE)
