@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import List, Optional
 
 from dataclasses_json import DataClassJsonMixin, Undefined, dataclass_json
@@ -8,7 +8,7 @@ from dataclasses_json import DataClassJsonMixin, Undefined, dataclass_json
 from .common import SL_TZ, TransportMode, dt_field
 
 
-class DepartureState(str, Enum):
+class DepartureState(StrEnum):
     NOTEXPECTED = "NOTEXPECTED"
     NOTCALLED = "NOTCALLED"
     EXPECTED = "EXPECTED"
@@ -24,7 +24,7 @@ class DepartureState(str, Enum):
     ASSUMEDDEPARTED = "ASSUMEDDEPARTED"
 
 
-class JourneyState(str, Enum):
+class JourneyState(StrEnum):
     # Do not show departure at all. Some systems might instead indicate that this departure is available only if ordered
     NOTEXPECTED = "NOTEXPECTED"
 
@@ -71,13 +71,13 @@ class JourneyState(str, Enum):
     ASSUMEDCOMPLETED = "ASSUMEDCOMPLETED"
 
 
-class JourneyPredictionState(str, Enum):
+class JourneyPredictionState(StrEnum):
     NORMAL = "NORMAL"
     LOSTCONTACT = "LOSTCONTACT"
     UNRELIABLE = "UNRELIABLE"
 
 
-class JourneyPassengerLevel(str, Enum):
+class JourneyPassengerLevel(StrEnum):
     EMPTY = "EMPTY"
     SEATSAVAILABLE = "SEATSAVAILABLE"
     STANDINGPASSENGERS = "STANDINGPASSENGERS"
@@ -85,7 +85,7 @@ class JourneyPassengerLevel(str, Enum):
     UNKNOWN = "UNKNOWN"
 
 
-class StopAreaType(str, Enum):
+class StopAreaType(StrEnum):
     BUSTERM = "BUSTERM"
     METROSTN = "METROSTN"
     TRAMSTN = "TRAMSTN"

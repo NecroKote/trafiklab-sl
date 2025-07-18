@@ -2,7 +2,7 @@ import re
 import sys
 from dataclasses import MISSING, field
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Optional, Union
 from zoneinfo import ZoneInfo
 
@@ -44,7 +44,7 @@ def dt_field(alias: Optional[str] = None, default=MISSING, tzinfo=None):
     )
 
 
-class TransportMode(str, Enum):
+class TransportMode(StrEnum):
     BUS = "BUS"
     METRO = "METRO"
     TRAM = "TRAM"

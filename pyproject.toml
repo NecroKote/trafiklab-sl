@@ -7,7 +7,7 @@ name = "trafiklab-sl"
 version = "1.0.2"
 description = "Storstockholms Lokaltrafik (SL) data via Trafiklab API"
 readme = "README.md"
-requires-python = ">=3.9.0"
+requires-python = ">=3.11.0"
 license = { file = "LICENSE.txt" }
 keywords = ["SL", "Storstockholms Lokaltrafik", "Trafiklab"]
 authors = [
@@ -18,10 +18,9 @@ classifiers = [
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Software Development :: Libraries",
 ]
 dependencies = [
@@ -56,7 +55,7 @@ asyncio_mode = "auto"
 legacy_tox_ini = """
     [tox]
     minversion = 4.14.0
-    envlist = py39,py310,py311,py312,py313
+    envlist = py311,py312,py313
 
     [testenv]
     deps =
