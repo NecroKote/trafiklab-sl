@@ -62,7 +62,4 @@ legacy_tox_ini = """
         pytest-asyncio==0.23.5
 
     commands = pytest -s tests --integration
-
-    pass_env =
-        SL_LOOKUP_API_KEY
 """

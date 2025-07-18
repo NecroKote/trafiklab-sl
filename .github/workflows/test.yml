@@ -25,5 +25,4 @@ jobs:
       - name: Run test suite
         run: tox run --skip-pkg-install
         env:
-          SL_LOOKUP_API_KEY: ${{ secrets.SL_LOOKUP_API_KEY }}
           TOX_GH_MAJOR_MINOR: ${{ matrix.python-version }}
