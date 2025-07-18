@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, List, Optional, cast
 from urllib.parse import quote
 
 from ..models.departures import SiteDepartureResponse, TransportMode
@@ -58,12 +58,11 @@ class TransportClient(AsyncClient):
         )
 
         response = await self._request_json(args)
+        return cast(SiteDepartureResponse, response)
 
-        return SiteDepartureResponse.schema().load(response)
-
-    async def get_sites(self):
+    async def get_sites(self) -> List[Site]:
         """List all sites within Region Stockholm"""
 
         args = UrlParams("https://transport.integration.sl.se/v1/sites", None)
         response = await self._request_json(args)
-        return Site.schema().load(response, many=True)
+        return cast(List[Site], response)
