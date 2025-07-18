@@ -1,72 +1,60 @@
-from dataclasses import dataclass, field
-from typing import List, Optional, Union
-
-from dataclasses_json import DataClassJsonMixin, Undefined, config, dataclass_json
-from marshmallow import fields
+from enum import IntEnum, StrEnum
+from typing import TypedDict
 
 
-class LookupSiteId(str):
-    """
-    The siteid is used to identify a stop in the SL Stop Lookup API.
+class StopFinderResultType(StrEnum):
+    ADDRESS = "address"
+    STOP = "stop"
+    SINGLEHOUSE = "singlehouse"
+    POI = "poi"
+    STREET = "street"
 
-    It is a string of 9 characters.
-    The first character is always 3.
-    The 4th character is always 1.
-    """
+class StopArea(TypedDict):
+    id: str
+    name: str
+    type: str
 
-    transport_siteid: int
+class StopProductClass(IntEnum):
+    TRAIN = 0
+    METRO = 2
+    LOCAL_TRAIN = 4
+    TRAM = 4
+    BUS = 5
+    SHIP_AND_FERRY = 9
+    TRANSIT_ON_DEMAND_AREA_SERVICE = 10
+    LONG_DISTANCE_TRAIN = 14
+    EXPRESS_TRAIN = 14
 
-    def __new__(cls, value, *args, **kwargs):
-        value = super().__new__(cls, value)
+class StopFinderType(TypedDict):
+    # The id of the search result.
+    id: str
 
-        if not value.isdigit():
-            raise ValueError("siteid must only contain digits")
+    # Value is true if location is a stop.
+    isGlobalId: bool
 
-        if not (value[0] == "3" and value[3] == "1"):
-            raise ValueError("siteid must start with 3 and have 1 as 4th character")
+    # The name of the search result, including municipality name
+    name: str
 
-        # 3BA1CDEFG -> ABCDEFG
-        value.transport_siteid = int(value[2] + value[1] + value[4:])
+    # The name of the search result, without municipality name
+    disassembledName: str
 
-        return value
+    # The coordinates of the search result.
+    coord: tuple[float, float]
 
-    @classmethod
-    def from_siteid(cls, value: Union[str, int]):
-        """
-        Create a LookupSiteId from a siteid
+    # The type of the result.
+    type: StopFinderResultType
 
-        `value` can be in short and long (3xx1xxxxx) form.
-        """
+    # The street name, if search result is type "street or singlehouse"
+    streetName: str | None
 
-        value = str(value).lstrip("0")
+    # The house number, if search result is "singlehouse".
+    buildingNumber: str | None
 
-        if len(value) == 9 and value[0] == "3" and value[3] == "1":
-            return cls(value)
-        else:
-            value = value.zfill(7)
-            # ABCDEFG -> 3BA1CDEFG
-            return cls(f"3{value[1]}{value[0]}1{value[2:]}")
+    # Quality of the query matching.
+    matchQuality: int
 
+    # Products at this stop
+    productClasses: list[StopProductClass]
 
-@dataclass_json(undefined=Undefined.EXCLUDE)
-@dataclass(frozen=True)
-class Stop(DataClassJsonMixin):
-    # The name of the stop generaly known to the public
-    Name: str
-
-    # Unique identifier of a stop
-    SiteId: LookupSiteId = field(
-        metadata=config(encoder=str, decoder=LookupSiteId, mm_field=fields.String())
-    )
-
-    # Type of the station
-    Type: str
-
-    #
-    X: str
-
-    #
-    Y: str
-
-    #
-    Products: Optional[List[str]]
+    # Principality of the stop or stop area.
+    parent: StopArea

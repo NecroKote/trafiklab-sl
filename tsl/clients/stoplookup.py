@@ -1,71 +1,43 @@
-from typing import List
+from typing import List, cast
 
-import aiohttp
-
-from ..models.stops import Stop
-from .common import (
-    PARAM_KEY,
-    AsyncClient,
-    OperationFailed,
-    ResponseFormatChanged,
-    UrlParams,
-)
+from ..models.stops import StopFinderType
+from .common import AsyncClient, ResponseFormatChanged, UrlParams
 
 
 class StopLookupClient(AsyncClient):
     """
     client for SL Stop Lookup API
-    https://www.trafiklab.se/api/trafiklab-apis/sl/stop-lookup/
+    https://www.trafiklab.se/sv/api/our-apis/sl/journey-planner-2/
     """
 
-    def __init__(self, api_key: str, session: aiohttp.ClientSession):
-        """
-        :param api_key: the "Trafikverket öppet API" key
-        """
-
-        super().__init__(session)
-        self._api_key = api_key
-
     @staticmethod
-    def get_request_url_params(
-        api_key: str,
-        search_string: str,
-        max_results: int = 10,
-    ) -> UrlParams:
+    def _get_request_url_params(search_string: str) -> UrlParams:
         """returns url and params to request stops"""
 
         if len(search_string) > 20:
             raise ValueError("search_string too long. max 20 characters")
 
-        if max_results < 1 or max_results >= 50:
-            raise ValueError("max_results must be between 1 and 50")
-
         params = [
-            (PARAM_KEY, api_key),
-            ("searchstring", search_string),
-            ("maxresults", str(max_results)),
-            ("type", "S"),  # "Stations only"
+            ("name_sf", search_string),
+            ("type_sf", "any"),
+            ("any_obj_filter_sf", "2"),  # 2 = stops only
         ]
 
         return UrlParams(
-            "https://journeyplanner.integration.sl.se/v1/typeahead.json",
+            "https://journeyplanner.integration.sl.se/v2/stop-finder",
             params,
         )
 
-    async def get_stops(self, search_string: str, max_results: int = 10) -> List[Stop]:
+    async def get_stops(self, search_string: str) -> List[StopFinderType]:
         """
         Get stops by search string
         """
 
-        args = self.get_request_url_params(self._api_key, search_string, max_results)
+        args = self._get_request_url_params(search_string)
         response = await self._request_json(args)
 
-        if (code := response.get("StatusCode")) is None:
-            raise ResponseFormatChanged("'StatusCode' not found in response")
-        elif code != 0:
-            raise OperationFailed(code, response["Message"])
-
-        if (data := response.get("ResponseData")) is None:
+        if (locations := response.get("locations")) is None:
             raise ResponseFormatChanged("'ResponseData' not found in response")
 
-        return Stop.schema().load(data, many=True)
+        locations = cast(list[StopFinderType], locations)
+        return sorted(locations, key=lambda x: x["matchQuality"], reverse=True)

@@ -26,11 +26,12 @@ pip install -e '.[dev,test]'
 
 The client is based on the `aiohttp` library and is async. It is used to fetch data from the Trafiklab API.
 The library supports following SL APIs:
-- [SL Deviatons API](https://www.trafiklab.se/api/trafiklab-apis/sl/deviations/)
-- [SL Transport API](https://www.trafiklab.se/api/trafiklab-apis/sl/transport/)
+- [SL Deviatons API](https://www.trafiklab.se/api/our-apis/sl/deviations/)
+- [SL Transport API](https://www.trafiklab.se/api/our-apis/sl/transport/)
   - "Departures from Site"
   - "Sites"
-- [SL Stop lookup API](https://www.trafiklab.se/api/trafiklab-apis/sl/stop-lookup/)
+- [SL Journey-planner v2 API](https://www.trafiklab.se/api/our-apis/sl/journey-planner-2/)
+  - "Stop lookup"
 
 More APIs will be added in the future.
 
@@ -45,25 +46,26 @@ import aiohttp
 from tsl.clients.stoplookup import StopLookupClient
 from tsl.clients.transport import TransportClient
 from tsl.models.common import TransportMode
+from tsl.utils import global_id_to_site_id
 
 
 async def main():
     async with aiohttp.ClientSession() as session:
 
         # perform stop lookup to get the site id for Stockholm Central
-        lookup_client = StopLookupClient("your 'Trafikverket öppet API' api key", session)
+        lookup_client = StopLookupClient(session)
         stops = await lookup_client.get_stops("Stockholm Central")
         if (central_station := next(iter(stops), None)) is None:
             raise RuntimeError(r"Could not find Stockholm Central. Weird ¯\_(ツ)_/¯")
 
         # get the transport API site id for Stockholm Central
-        transport_api_siteid = central_station.SiteId.transport_siteid
+        transport_api_siteid = global_id_to_site_id(central_station['id'])
 
         # get upcoming train departures
         client = TransportClient(session)
         reponse = await client.get_site_departures(transport_api_siteid, transport=TransportMode.TRAIN)
 
-    print(f"Upcoming trains at {central_station.Name}:")
+    print(f"Upcoming trains at {central_station['disassembledName']}:")
     for departure in sorted(reponse.departures, key=lambda d: d.expected):
         print(
             f"[{departure.line.designation}] platform {departure.stop_point.designation}"

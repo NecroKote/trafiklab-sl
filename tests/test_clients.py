@@ -10,7 +10,6 @@ from tsl.clients.transport import TransportClient
 from tsl.models.departures import Departure, SiteDepartureResponse
 from tsl.models.deviations import Deviation, TransportMode
 from tsl.models.sites import Site
-from tsl.models.stops import Stop
 
 
 @pytest.fixture
@@ -65,14 +64,10 @@ async def test_transport_sites(session):
 
 @pytest.mark.integration
 async def test_stop_lookup(session):
-    with pytest.raises(OperationFailed):
-        await StopLookupClient("", session).get_stops("any")
+    cl = StopLookupClient(session)
+    stops = await cl.get_stops("Odenplan")
+    assert isinstance(stops, list)
 
-    cl = StopLookupClient(os.environ["SL_LOOKUP_API_KEY"], session)
-    stops = await cl.get_stops("Oden")
-
-    # serialization loop
-    raw = Stop.schema().dumps(stops, many=True)
-    # ... with extra data to be ignored
-    raw = raw[:-2] + ', "extra": "data"}]'
-    Stop.schema().loads(raw, many=True)
+    if stops:
+        assert stops[0]["disassembledName"] == "Odenplan"
+        assert stops[0]["id"] == "9091001000009117"
