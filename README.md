@@ -5,7 +5,7 @@
 [![test](https://github.com/NecroKote/trafiklab-sl/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/NecroKote/trafiklab-sl/actions/workflows/test.yml)
 [![license](https://img.shields.io/github/license/necrokote/trafiklab-sl)](https://github.com/NecroKote/trafiklab-sl/blob/main/LICENSE.txt)
 
-A data model for Storstockholms Lokaltrafik (SL) data.
+A data model describing Storstockholms Lokaltrafik (SL) data.
 
 Also contains an async client for fetching data from the [Trafiklab API](https://www.trafiklab.se/api/).
 
@@ -66,10 +66,10 @@ async def main():
         reponse = await client.get_site_departures(transport_api_siteid, transport=TransportMode.TRAIN)
 
     print(f"Upcoming trains at {central_station['disassembledName']}:")
-    for departure in sorted(reponse.departures, key=lambda d: d.expected):
+    for departure in sorted(reponse["departures"], key=lambda d: d.get("expected", "")):
         print(
-            f"[{departure.line.designation}] platform {departure.stop_point.designation}"
-            f" to {departure.destination} ({departure.display})"
+            f"[{departure['line'].get('designation')}] platform {departure['stop_point'].get('designation')}"
+            f" to {departure.get('destination')} ({departure['display']})"
         )
 
 

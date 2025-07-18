@@ -1,5 +1,5 @@
 from enum import IntEnum, StrEnum
-from typing import TypedDict
+from typing import List, Tuple, TypedDict, NotRequired
 
 
 class StopFinderResultType(StrEnum):
@@ -39,22 +39,22 @@ class StopFinderType(TypedDict):
     disassembledName: str
 
     # The coordinates of the search result.
-    coord: tuple[float, float]
+    coord: Tuple[float, float]
 
     # The type of the result.
     type: StopFinderResultType
 
     # The street name, if search result is type "street or singlehouse"
-    streetName: str | None
+    streetName: NotRequired[str]
 
     # The house number, if search result is "singlehouse".
-    buildingNumber: str | None
+    buildingNumber: NotRequired[str]
 
     # Quality of the query matching.
     matchQuality: int
 
     # Products at this stop
-    productClasses: list[StopProductClass]
+    productClasses: List[StopProductClass]
 
     # Principality of the stop or stop area.
     parent: StopArea

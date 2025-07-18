@@ -1,35 +1,31 @@
-from dataclasses import dataclass
-from datetime import datetime
 from enum import StrEnum
-from typing import List, Optional
+from typing import List, NotRequired, TypedDict
 
-from dataclasses_json import DataClassJsonMixin, Undefined, dataclass_json
-
-from .common import SL_TZ, TransportMode, dt_field
+from .common import TransportMode
 
 
 class DepartureState(StrEnum):
-    NOTEXPECTED = "NOTEXPECTED"
-    NOTCALLED = "NOTCALLED"
+    NOT_EXPECTED = "NOTEXPECTED"
+    NOT_CALLED = "NOTCALLED"
     EXPECTED = "EXPECTED"
     CANCELLED = "CANCELLED"
     INHIBITED = "INHIBITED"
-    ATSTOP = "ATSTOP"
+    AT_STOP = "ATSTOP"
     BOARDING = "BOARDING"
-    BOARDINGCLOSED = "BOARDINGCLOSED"
+    BOARDING_CLOSED = "BOARDINGCLOSED"
     DEPARTED = "DEPARTED"
     PASSED = "PASSED"
     MISSED = "MISSED"
     REPLACED = "REPLACED"
-    ASSUMEDDEPARTED = "ASSUMEDDEPARTED"
+    ASSUMED_DEPARTED = "ASSUMEDDEPARTED"
 
 
 class JourneyState(StrEnum):
     # Do not show departure at all. Some systems might instead indicate that this departure is available only if ordered
-    NOTEXPECTED = "NOTEXPECTED"
+    NOT_EXPECTED = "NOTEXPECTED"
 
     # If a not expected dated vehicle journey is never run, it should at some point in time be considered as not run
-    NOTRUN = "NOTRUN"
+    NOT_RUN = "NOTRUN"
 
     # Normally show target time for departure
     EXPECTED = "EXPECTED"
@@ -41,25 +37,25 @@ class JourneyState(StrEnum):
     CANCELLED = "CANCELLED"
 
     # If the presentation system only shows vehicles that are in progress, do not show the departure
-    SIGNEDON = "SIGNEDON"
+    SIGNED_ON = "SIGNEDON"
 
     # Normally show target time for departure. A symbol or text indicating that the vehicle journey is at origin, but not yet in progress could be added depending on presentation system configuration. If the presentation system only shows vehicles that are in progress, do not show the departure
-    ATORIGIN = "ATORIGIN"
+    AT_ORIGIN = "ATORIGIN"
 
     # Present the current vehicle journey position, i.e. "has left station X Z minutes ago" or "currently at station Y". Systems that cannot present texts of that size should use a symbol or text indicating that the vehicle journey prediction is unreliable
-    FASTPROGRESS = "FASTPROGRESS"
+    FAST_PROGRESS = "FASTPROGRESS"
 
     # Present the current vehicle journey position, i.e. "has left station X Z minutes ago" or "currently at station Y"
-    NORMALPROGRESS = "NORMALPROGRESS"
+    NORMAL_PROGRESS = "NORMALPROGRESS"
 
     # Present the current vehicle journey position, i.e. "has left station X Z minutes ago" or "currently at station Y" and information that "traffic moves slowly". Systems that cannot present texts of that size should use a symbol or text indicating that the vehicle journey prediction is unreliable
-    SLOWPROGRESS = "SLOWPROGRESS"
+    SLOW_PROGRESS = "SLOWPROGRESS"
 
     # Present the current vehicle journey position, i.e. "has left station X Z minutes ago" or "currently at station Y" and information that there is a "stop in traffic". Systems that cannot present texts of that size should use a symbol or text indicating that the vehicle journey prediction is unreliable
-    NOPROGRESS = "NOPROGRESS"
+    NO_PROGRESS = "NOPROGRESS"
 
     # If the vehicle system detects that a vehicle is not following the expected route, it can change the state to off route
-    OFFROUTE = "OFFROUTE"
+    OFF_ROUTE = "OFFROUTE"
 
     # If the vehicle finally reaches its destination, the vehicle journey receives the state completed, else it is aborted. Once in progress, a cancellation or sign off will be regarded as the monitored vehicle journey has been aborted. If an aborted dated vehicle journey is resumed again, PubTrans will create a new instance of a monitored vehicle journey
     ABORTED = "ABORTED"
@@ -68,81 +64,69 @@ class JourneyState(StrEnum):
     COMPLETED = "COMPLETED"
 
     # If an expected vehicle journey is not cancelled and never becomes in progress, it should at some point in time be considered as assumed completed
-    ASSUMEDCOMPLETED = "ASSUMEDCOMPLETED"
+    ASSUMED_COMPLETED = "ASSUMEDCOMPLETED"
 
 
 class JourneyPredictionState(StrEnum):
     NORMAL = "NORMAL"
-    LOSTCONTACT = "LOSTCONTACT"
+    LOST_CONTACT = "LOSTCONTACT"
     UNRELIABLE = "UNRELIABLE"
 
 
 class JourneyPassengerLevel(StrEnum):
     EMPTY = "EMPTY"
-    SEATSAVAILABLE = "SEATSAVAILABLE"
-    STANDINGPASSENGERS = "STANDINGPASSENGERS"
-    PASSENGERSLEFTBEHIND = "PASSENGERSLEFTBEHIND"
+    SEATS_AVAILABLE = "SEATSAVAILABLE"
+    STANDING_PASSENGERS = "STANDINGPASSENGERS"
+    PASSENGERS_LEFT_BEHIND = "PASSENGERSLEFTBEHIND"
     UNKNOWN = "UNKNOWN"
 
 
 class StopAreaType(StrEnum):
-    BUSTERM = "BUSTERM"
-    METROSTN = "METROSTN"
-    TRAMSTN = "TRAMSTN"
-    RAILWSTN = "RAILWSTN"
-    SHIPBER = "SHIPBER"
-    FERRYBER = "FERRYBER"
+    BUS_TERMINAL = "BUSTERM"
+    METRO_STATION = "METROSTN"
+    TRAM_STATION = "TRAMSTN"
+    RAILWAY_STATION = "RAILWSTN"
+    SHIP_BERTH = "SHIPBER"
+    FERRY_BERTH = "FERRYBER"
     AIRPORT = "AIRPORT"
-    TAXITERM = "TAXITERM"
+    TAXI_TERMINAL = "TAXITERM"
     UNKNOWN = "UNKNOWN"
 
 
-@dataclass_json(undefined=Undefined.EXCLUDE)
-@dataclass(frozen=True)
-class DepartureJourney:
+class DepartureJourney(TypedDict):
     id: int
     state: JourneyState
-    prediction_state: Optional[JourneyPredictionState] = None
-    passenger_level: Optional[JourneyPassengerLevel] = None
+    prediction_state: NotRequired[JourneyPredictionState]
+    passenger_level: NotRequired[JourneyPassengerLevel]
 
 
-@dataclass_json(undefined=Undefined.EXCLUDE)
-@dataclass(frozen=True)
-class StopAreaReference:
+class StopAreaReference(TypedDict):
     id: int
     name: str
-    sname: Optional[str] = None
-    type: Optional[StopAreaType] = None
+    sname: NotRequired[str]
+    type: NotRequired[StopAreaType]
 
 
-@dataclass_json(undefined=Undefined.EXCLUDE)
-@dataclass(frozen=True)
-class StopPointReference:
+class StopPointReference(TypedDict):
     id: int
-    name: Optional[str] = None
-    designation: Optional[str] = None
+    name: NotRequired[str]
+    designation: NotRequired[str]
 
 
-@dataclass_json(undefined=Undefined.EXCLUDE)
-@dataclass(frozen=True)
-class LineReference:
+class LineReference(TypedDict):
     id: int
-    designation: Optional[str] = None
-    transport_mode: Optional[TransportMode] = None
-    group_of_lines: Optional[str] = None
+    designation: NotRequired[str]
+    transport_mode: NotRequired[TransportMode]
+    group_of_lines: NotRequired[str]
 
 
-@dataclass_json(undefined=Undefined.EXCLUDE)
-@dataclass(frozen=True)
-class DepartureDeviation:
+class DepartureDeviation(TypedDict):
     importance_level: int
     consequence: str
     message: str
 
 
-@dataclass_json(undefined=Undefined.EXCLUDE)
-@dataclass(frozen=True)
-class Departure:
+class Departure(TypedDict):
     direction: str
     direction_code: int
     state: DepartureState
@@ -152,32 +136,26 @@ class Departure:
     stop_point: StopPointReference
     line: LineReference
     deviations: List[DepartureDeviation]
-    scheduled: datetime = dt_field(tzinfo=SL_TZ)
-    expected: Optional[datetime] = dt_field(tzinfo=SL_TZ)
-    via: Optional[str] = None
-    destination: Optional[str] = None
+    scheduled: str
+    expected: NotRequired[str]
+    via: NotRequired[str]
+    destination: NotRequired[str]
 
 
-@dataclass_json(undefined=Undefined.EXCLUDE)
-@dataclass(frozen=True)
-class DeviationScope:
-    description: Optional[str] = None
-    lines: Optional[List[LineReference]] = None
-    stop_areas: Optional[List[StopAreaReference]] = None
-    stop_points: Optional[List[StopPointReference]] = None
+class DeviationScope(TypedDict):
+    description: NotRequired[str]
+    lines: NotRequired[List[LineReference]]
+    stop_areas: NotRequired[List[StopAreaReference]]
+    stop_points: NotRequired[List[StopPointReference]]
 
 
-@dataclass_json(undefined=Undefined.EXCLUDE)
-@dataclass(frozen=True)
-class StopDeviation:
+class StopDeviation(TypedDict):
     id: int
     importance_level: int
     message: str
     scope: DeviationScope
 
 
-@dataclass_json(undefined=Undefined.EXCLUDE)
-@dataclass(frozen=True)
-class SiteDepartureResponse(DataClassJsonMixin):
+class SiteDepartureResponse(TypedDict):
     departures: List[Departure]
     stop_deviations: List[StopDeviation]

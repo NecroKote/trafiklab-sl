@@ -25,7 +25,6 @@ classifiers = [
 ]
 dependencies = [
     "aiohttp",
-    "dataclasses_json",
 ]
 
 [project.urls]

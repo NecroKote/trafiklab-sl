@@ -1,24 +1,16 @@
-from dataclasses import dataclass
-from datetime import datetime
-from typing import List, Optional
+from typing import List, TypedDict, NotRequired
 
-from dataclasses_json import DataClassJsonMixin, Undefined, dataclass_json
-
-from .common import SL_TZ, dt_field
-
-
-@dataclass_json(undefined=Undefined.EXCLUDE)
-@dataclass(frozen=True)
-class ValidityPeriod:
-    """The period for which the object is valid"""
-
-    from_: datetime = dt_field(alias="from", tzinfo=SL_TZ)
-    to: Optional[datetime] = dt_field(default=None, tzinfo=SL_TZ)
+ValidityPeriod = TypedDict(
+    "ValidityPeriod",
+    {
+        "from": str,
+        "to": NotRequired[str],
+    },
+)
+"""The period for which the object is valid"""
 
 
-@dataclass_json(undefined=Undefined.EXCLUDE)
-@dataclass(frozen=True)
-class Site(DataClassJsonMixin):
+class Site(TypedDict):
     # Unique identifier of a site
     id: int
 
@@ -32,16 +24,16 @@ class Site(DataClassJsonMixin):
     valid: ValidityPeriod
 
     # Alias names that describes the same place but with a different name
-    alias: Optional[List[str]] = None
+    alias: NotRequired[List[str]]
 
     # An abbreviation for the site
-    abbreviation: Optional[str] = None
+    abbreviation: NotRequired[str]
 
     # Additional note related to the site
-    note: Optional[str] = None
+    note: NotRequired[str]
 
     # WGS84 latitude in decimal degrees
-    lat: Optional[float] = 0.0
+    lat: NotRequired[float]
 
     # WGS84 longitude in decimal degrees
-    lon: Optional[float] = 0.0
+    lon: NotRequired[float]

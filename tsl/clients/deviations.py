@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, cast
 
 from ..models.deviations import Deviation, TransportMode
 from .common import AsyncClient, UrlParams
@@ -22,7 +22,7 @@ class DeviationsClient(AsyncClient):
     ) -> UrlParams:
         """returns url and params to request deviations"""
 
-        params: list[tuple[str, str]] = []
+        params: List[tuple[str, str]] = []
         if future is not None:
             params.append(("future", "true" if future else "false"))
         if site is not None:
@@ -49,4 +49,4 @@ class DeviationsClient(AsyncClient):
             future, site, line, transport_authority, transport_mode
         )
         response = await self._request_json(args)
-        return Deviation.schema().load(response, many=True)
+        return cast(List[Deviation], response)

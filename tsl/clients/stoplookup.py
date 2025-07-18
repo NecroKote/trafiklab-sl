@@ -39,5 +39,5 @@ class StopLookupClient(AsyncClient):
         if (locations := response.get("locations")) is None:
             raise ResponseFormatChanged("'ResponseData' not found in response")
 
-        locations = cast(list[StopFinderType], locations)
+        locations = cast(List[StopFinderType], locations)
         return sorted(locations, key=lambda x: x["matchQuality"], reverse=True)
