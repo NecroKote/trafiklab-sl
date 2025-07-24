@@ -32,8 +32,7 @@ The library supports following SL APIs:
   - "Sites"
 - [SL Journey-planner v2 API](https://www.trafiklab.se/api/our-apis/sl/journey-planner-2/)
   - "Stop lookup"
-
-More APIs will be added in the future.
+  - "Journey Planner"
 
 ## Example
 
@@ -45,6 +44,7 @@ import aiohttp
 
 from tsl.clients.stoplookup import StopLookupClient
 from tsl.clients.transport import TransportClient
+from tsl.clients.journey import JourneyPlannerClient, SearchLeg
 from tsl.models.common import TransportMode
 from tsl.utils import global_id_to_site_id
 
@@ -65,12 +65,23 @@ async def main():
         client = TransportClient(session)
         reponse = await client.get_site_departures(transport_api_siteid, transport=TransportMode.TRAIN)
 
+        # get step by step journey from Stockholm Central to a specific location
+        route_client = JourneyPlannerClient(session)
+        params = route_client.build_request_params(
+            origin=SearchLeg.from_stop_finder(central_station),
+            destination=SearchLeg.from_coordinates("59.274695", "18.033901"),
+            calc_number_of_trips=1
+        )
+        steps = await route_client.search_trip(params)
+
     print(f"Upcoming trains at {central_station['disassembledName']}:")
     for departure in sorted(reponse["departures"], key=lambda d: d.get("expected", "")):
         print(
             f"[{departure['line'].get('designation')}] platform {departure['stop_point'].get('designation')}"
             f" to {departure.get('destination')} ({departure['display']})"
         )
+
+    print(f"\nJourney steps: {len(steps)} from Stockholm Central to 59.274695, 18.033901")
 
 
 asyncio.run(main())
