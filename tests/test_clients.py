@@ -1,5 +1,6 @@
 import aiohttp
 import pytest
+import sys
 
 from tsl.clients.deviations import DeviationsClient
 from tsl.clients.stoplookup import StopLookupClient
@@ -34,7 +35,10 @@ async def test_transport_departures(session):
     response = await cl.get_site_departures(1002)
 
     if departure := next(iter(response["departures"]), None):
-        assert departure["state"] in DepartureState
+        if sys.version_info < (3, 12):
+            assert departure["state"] in DepartureState._value2member_map_
+        else:
+            assert departure["state"] in DepartureState
 
 
 
