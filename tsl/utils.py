@@ -1,5 +1,4 @@
 import re
-import sys
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -13,13 +12,6 @@ def from_sl_dt(dt_str: str) -> datetime:
 
     The SL datetime format is expected to be in ISO 8601 format, e.g., "2023-10-01T12:00:00".
     """
-
-    # HACK: python prior to 3.11 does not handle ms part correctly
-    # in fromisoformat unless it's 3 digits long
-    if sys.version_info < (3, 11):
-        if msec := ISO_MSEC_PART.search(dt_str):
-            if len(msec.group(1)) < 3:
-                dt_str = dt_str.replace(msec.group(0), f".{msec.group(1).ljust(3, '0')}+")
 
     dt = datetime.fromisoformat(dt_str)
     return dt.astimezone(SL_TZ)
