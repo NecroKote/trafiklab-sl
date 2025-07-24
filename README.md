@@ -47,6 +47,7 @@ from tsl.clients.transport import TransportClient
 from tsl.clients.journey import JourneyPlannerClient, SearchLeg
 from tsl.models.common import TransportMode
 from tsl.utils import global_id_to_site_id
+from tsl.tools.journey import SimpleJourneyInterpreter, leg_display_str
 
 
 async def main():
@@ -72,7 +73,8 @@ async def main():
             destination=SearchLeg.from_coordinates("59.274695", "18.033901"),
             calc_number_of_trips=1
         )
-        steps = await route_client.search_trip(params)
+        ways_to_get_there = await route_client.search_trip(params)
+        # use `SimpleJourneyInterpreter` to interpret the journey data in a human-readable way
 
     print(f"Upcoming trains at {central_station['disassembledName']}:")
     for departure in sorted(reponse["departures"], key=lambda d: d.get("expected", "")):
@@ -81,7 +83,12 @@ async def main():
             f" to {departure.get('destination')} ({departure['display']})"
         )
 
-    print(f"\nJourney steps: {len(steps)} from Stockholm Central to 59.274695, 18.033901")
+    print(f"\nNumber of ways to get from Stockholm Central to 59.274695, 18.033901 - {len(ways_to_get_there)}")
+    interpreter = SimpleJourneyInterpreter(ways_to_get_there[0])
+
+    print("Itinerary of the first way:")
+    for leg in interpreter.get_itinerary():
+        print("  - " + leg_display_str(leg))
 
 
 asyncio.run(main())
