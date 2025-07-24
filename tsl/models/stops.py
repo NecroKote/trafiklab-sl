@@ -1,36 +1,30 @@
-from enum import IntEnum, StrEnum
-from typing import List, Tuple, TypedDict, NotRequired
+from enum import StrEnum
+from typing import List, TypedDict, NotRequired
+
+from .common import CoordTuple, ProductClass
 
 
 class StopFinderResultType(StrEnum):
     ADDRESS = "address"
     STOP = "stop"
+    PLATFORM = "platform"
     SINGLEHOUSE = "singlehouse"
     POI = "poi"
     STREET = "street"
+
 
 class StopArea(TypedDict):
     id: str
     name: str
     type: str
 
-class StopProductClass(IntEnum):
-    TRAIN = 0
-    METRO = 2
-    LOCAL_TRAIN = 4
-    TRAM = 4
-    BUS = 5
-    SHIP_AND_FERRY = 9
-    TRANSIT_ON_DEMAND_AREA_SERVICE = 10
-    LONG_DISTANCE_TRAIN = 14
-    EXPRESS_TRAIN = 14
 
 class StopFinderType(TypedDict):
     # The id of the search result.
     id: str
 
     # Value is true if location is a stop.
-    isGlobalId: bool
+    isGlobalId: NotRequired[bool]
 
     # The name of the search result, including municipality name
     name: str
@@ -39,7 +33,7 @@ class StopFinderType(TypedDict):
     disassembledName: str
 
     # The coordinates of the search result.
-    coord: Tuple[float, float]
+    coord: CoordTuple
 
     # The type of the result.
     type: StopFinderResultType
@@ -54,7 +48,7 @@ class StopFinderType(TypedDict):
     matchQuality: int
 
     # Products at this stop
-    productClasses: List[StopProductClass]
+    productClasses: NotRequired[List[ProductClass]]
 
     # Principality of the stop or stop area.
     parent: StopArea

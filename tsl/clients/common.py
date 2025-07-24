@@ -68,7 +68,6 @@ class ResponseFormatChanged(ClientException):
 class OperationFailed(ClientException):
     """Raised when an operation failed with known error code"""
 
-    def __init__(self, code: int, message: str):
-        self.code = code
-        self.message = message
-        super().__init__(f"{code}: {message}")
+    def __init__(self, errors: List[str]):
+        self.errors = errors
+        super().__init__(f"Operation failed with errors: {', '.join(errors)}")
