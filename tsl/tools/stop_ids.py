@@ -118,8 +118,7 @@ def stop_id_to_site_id(stop_id: str) -> int:
     """
     if not stop_id.startswith(STOP_ID_PREFIX):
         raise ValueError(
-            f"Invalid stopId format: {stop_id}. "
-            f"Expected prefix {STOP_ID_PREFIX}"
+            f"Invalid stopId format: {stop_id}. " f"Expected prefix {STOP_ID_PREFIX}"
         )
     return int(stop_id[len(STOP_ID_PREFIX) :])
 
