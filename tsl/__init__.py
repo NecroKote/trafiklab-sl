@@ -8,3 +8,30 @@ try:
     __version__ = version(__package__)
 except PackageNotFoundError:
     __version__ = "0.0.0+local"
+
+# Re-export helpers for convenient access
+from tsl.helpers import (
+    AsyncCache,
+    CacheBackend,
+    FileBackend,
+    LineHelper,
+    LineInfo,
+    MemoryBackend,
+    SearchMode,
+    StopHelper,
+    StopInfo,
+)
+
+__all__ = [
+    "__version__",
+    # Helpers
+    "AsyncCache",
+    "CacheBackend",
+    "FileBackend",
+    "MemoryBackend",
+    "SearchMode",
+    "StopHelper",
+    "StopInfo",
+    "LineHelper",
+    "LineInfo",
+]
