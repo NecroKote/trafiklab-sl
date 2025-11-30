@@ -2,7 +2,7 @@
 https://www.trafiklab.se/api/trafiklab-apis/sl/deviations
 """
 
-from typing import List, Optional, TypedDict, NotRequired
+from typing import List, NotRequired, Optional, TypedDict
 
 from .common import TransportMode
 
