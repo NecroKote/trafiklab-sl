@@ -115,9 +115,7 @@ class TransportClient(AsyncClient):
     # Lines endpoint
     # -------------------------------------------------------------------------
 
-    async def get_lines(
-        self, transport_authority_id: int = 1
-    ) -> LinesResponse:
+    async def get_lines(self, transport_authority_id: int = 1) -> LinesResponse:
         """
         List all lines within Region Stockholm.
 
