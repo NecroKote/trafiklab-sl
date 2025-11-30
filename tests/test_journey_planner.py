@@ -54,11 +54,19 @@ class TestBuildRequestParams:
         origin = SearchLeg(type="any", value="origin")
         dest = SearchLeg(type="any", value="dest")
 
-        with pytest.raises(ValueError, match="calc_number_of_trips must be between 1 and 3"):
-            JourneyPlannerClient.build_request_params(origin, dest, calc_number_of_trips=0)
+        with pytest.raises(
+            ValueError, match="calc_number_of_trips must be between 1 and 3"
+        ):
+            JourneyPlannerClient.build_request_params(
+                origin, dest, calc_number_of_trips=0
+            )
 
-        with pytest.raises(ValueError, match="calc_number_of_trips must be between 1 and 3"):
-            JourneyPlannerClient.build_request_params(origin, dest, calc_number_of_trips=4)
+        with pytest.raises(
+            ValueError, match="calc_number_of_trips must be between 1 and 3"
+        ):
+            JourneyPlannerClient.build_request_params(
+                origin, dest, calc_number_of_trips=4
+            )
 
     def test_via_parameters(self):
         """Test via stop parameters."""
@@ -78,7 +86,9 @@ class TestBuildRequestParams:
         dest = SearchLeg(type="any", value="dest")
         not_via = SearchLeg(type="stop", value="avoid_stop")
 
-        params = JourneyPlannerClient.build_request_params(origin, dest, not_via=not_via)
+        params = JourneyPlannerClient.build_request_params(
+            origin, dest, not_via=not_via
+        )
         param_dict = dict(params.params)
 
         assert param_dict["type_not_via"] == "stop"
@@ -90,7 +100,9 @@ class TestBuildRequestParams:
         dest = SearchLeg(type="any", value="dest")
         dwell = DwellTime(hours=0, minutes=15)
 
-        params = JourneyPlannerClient.build_request_params(origin, dest, dwell_time=dwell)
+        params = JourneyPlannerClient.build_request_params(
+            origin, dest, dwell_time=dwell
+        )
         param_dict = dict(params.params)
 
         assert param_dict["dwell_time"] == "00:15"
@@ -100,7 +112,9 @@ class TestBuildRequestParams:
         origin = SearchLeg(type="any", value="origin")
         dest = SearchLeg(type="any", value="dest")
 
-        params = JourneyPlannerClient.build_request_params(origin, dest, language=Language.EN)
+        params = JourneyPlannerClient.build_request_params(
+            origin, dest, language=Language.EN
+        )
         param_dict = dict(params.params)
 
         assert param_dict["language"] == "en"
@@ -180,7 +194,9 @@ class TestBuildRequestParams:
         origin = SearchLeg(type="any", value="origin")
         dest = SearchLeg(type="any", value="dest")
 
-        params = JourneyPlannerClient.build_request_params(origin, dest, change_speed=100)
+        params = JourneyPlannerClient.build_request_params(
+            origin, dest, change_speed=100
+        )
         param_dict = dict(params.params)
 
         assert param_dict["change_speed"] == 100
@@ -241,8 +257,12 @@ class TestBuildRequestParams:
         origin = SearchLeg(type="any", value="origin")
         dest = SearchLeg(type="any", value="dest")
 
-        with pytest.raises(ValueError, match="max_bike_distance cannot exceed 1000 meters"):
-            JourneyPlannerClient.build_request_params(origin, dest, max_bike_distance=5000)
+        with pytest.raises(
+            ValueError, match="max_bike_distance cannot exceed 1000 meters"
+        ):
+            JourneyPlannerClient.build_request_params(
+                origin, dest, max_bike_distance=5000
+            )
 
     def test_walk_trip_option(self):
         """Test walk-only trip option."""

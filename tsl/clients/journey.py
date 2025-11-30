@@ -102,7 +102,11 @@ class JourneyPlannerClient(AsyncClient):
         response = await self._request_json(args)
 
         locations = response.get("locations", [])
-        return [loc for loc in locations if loc.get("type") == "stop"] if stops_only else locations
+        return (
+            [loc for loc in locations if loc.get("type") == "stop"]
+            if stops_only
+            else locations
+        )
 
     @staticmethod
     def build_request_params(
@@ -254,10 +258,14 @@ class JourneyPlannerClient(AsyncClient):
             params.append(("incl_mot_10", "true" if include_on_demand else "false"))
 
         if include_national_train is not None:
-            params.append(("incl_mot_14", "true" if include_national_train else "false"))
+            params.append(
+                ("incl_mot_14", "true" if include_national_train else "false")
+            )
 
         if include_accessible_bus is not None:
-            params.append(("incl_mot_19", "true" if include_accessible_bus else "false"))
+            params.append(
+                ("incl_mot_19", "true" if include_accessible_bus else "false")
+            )
 
         # Additional parameters
         if change_speed is not None:
@@ -308,7 +316,9 @@ class JourneyPlannerClient(AsyncClient):
 
         if max_bike_distance is not None:
             if max_bike_distance > 1000:
-                raise ValueError("max_bike_distance cannot exceed 1000 meters (API limit)")
+                raise ValueError(
+                    "max_bike_distance cannot exceed 1000 meters (API limit)"
+                )
             params.append(("max_length_bicycle", max_bike_distance))
 
         # Walk-only trip
