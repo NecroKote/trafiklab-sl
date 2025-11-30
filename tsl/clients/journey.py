@@ -1,15 +1,108 @@
-from typing import List
+from datetime import date, time
+from typing import Any, Dict, List, TypedDict
 
 from tsl.models.journey import DwellTime, Journey, Language, RouteType, SearchLeg
 
 from .common import AsyncClient, OperationFailed, ResponseFormatChanged, UrlParams
 
 
+class SystemValidity(TypedDict):
+    """Route planning data availability period."""
+
+    from_date: str  # renamed from 'from' which is a Python keyword
+    to_date: str  # renamed from 'to'
+
+
+class StopParent(TypedDict, total=False):
+    """Parent location information for a stop."""
+
+    id: str
+    name: str
+    type: str
+
+
+class StopProperties(TypedDict, total=False):
+    """Additional properties for a stop."""
+
+    mainLocality: str
+    stopId: str
+
+
+class StopLocation(TypedDict, total=False):
+    """Stop location from stop-finder endpoint."""
+
+    id: str  # Global ID (e.g., "9091001000009117")
+    name: str  # Full name (e.g., "Stockholm, Odenplan")
+    disassembledName: str  # Short name (e.g., "Odenplan")
+    coord: List[float]  # [lat, lon]
+    type: str  # "stop", "poi", "address", etc.
+    matchQuality: int  # 0-1000, higher is better
+    isBest: bool  # True if this is the best match
+    isGlobalId: bool
+    parent: StopParent
+    productClasses: List[int]  # Transport mode classes
+    properties: StopProperties
+
+
 class JourneyPlannerClient(AsyncClient):
     """
     client for SL Journey Planner v2 API
-    https://www.trafiklab.se/sv/api/our-apis/sl/journey-planner-2/
+    https://www.trafiklab.se/api/our-apis/sl/journey-planner-2/
     """
+
+    BASE_URL = "https://journeyplanner.integration.sl.se/v2"
+
+    async def get_system_info(self) -> SystemValidity:
+        """
+        Get route planning data availability period.
+
+        Returns:
+            SystemValidity with from_date and to_date fields
+        """
+        args = UrlParams(f"{self.BASE_URL}/system-info", None)
+        response = await self._request_json(args)
+
+        validity = response.get("validity", {})
+        return SystemValidity(
+            from_date=validity.get("from", ""),
+            to_date=validity.get("to", ""),
+        )
+
+    async def find_stops(
+        self,
+        query: str,
+        stops_only: bool = True,
+    ) -> List[StopLocation]:
+        """
+        Search for stops, addresses, or points of interest by name.
+
+        This is useful for autocomplete/dropdown functionality when users
+        need to select a stop for journey planning.
+
+        Args:
+            query: Search query (e.g., "odenplan", "t-centralen")
+            stops_only: If True, only return stops (not addresses/POIs)
+
+        Returns:
+            List of StopLocation objects sorted by match quality
+
+        Example:
+            stops = await client.find_stops("odenplan")
+            # Use stops[0]["id"] with SearchLeg for journey planning
+        """
+        params: List[tuple[str, Any]] = [
+            ("name_sf", query),
+            ("type_sf", "any"),
+        ]
+
+        if stops_only:
+            params.append(("any_obj_filter_sf", 2))
+
+        args = UrlParams(f"{self.BASE_URL}/stop-finder", params)
+        response = await self._request_json(args)
+
+        locations = response.get("locations", [])
+        return [loc for loc in locations if loc.get("type") == "stop"] if stops_only else locations
 
     @staticmethod
     def build_request_params(
@@ -23,18 +116,89 @@ class JourneyPlannerClient(AsyncClient):
         max_changes: int | None = None,
         route_type: RouteType | None = None,
         include_coordinates: bool | None = None,
+        # Date/time parameters
+        departure_date: date | None = None,
+        departure_time: time | None = None,
+        search_for_arrival: bool = False,
+        # Transport mode filters (True=include, False=exclude, None=default)
+        include_train: bool | None = None,  # incl_mot_0 - Pendeltåg
+        include_metro: bool | None = None,  # incl_mot_2 - Tunnelbana
+        include_tram: bool | None = None,  # incl_mot_4 - Lokaltåg/Spårväg
+        include_bus: bool | None = None,  # incl_mot_5 - Buss
+        include_ship: bool | None = None,  # incl_mot_9 - Båttrafik
+        include_on_demand: bool | None = None,  # incl_mot_10 - Anropsstyrd
+        include_national_train: bool | None = None,  # incl_mot_14 - Fjärrtåg
+        include_accessible_bus: bool | None = None,  # incl_mot_19 - Närtrafik
+        # Additional parameters
+        change_speed: int | None = None,  # 25-400 (percentage)
+        suppress_alternatives: bool | None = None,  # no_alt
+        calc_one_direction: bool | None = None,
+        use_nearby_stops: bool | None = None,  # use_prox_foot_search
+        # Pedestrian options
+        max_walk_time: int | None = None,  # tr_it_mot_value100 (minutes)
+        max_pedestrian_time: int | None = None,  # max_time_pedestrian (minutes)
+        min_walk_distance: int | None = None,  # min_length_pedestrian (meters)
+        max_walk_distance: int | None = None,  # max_length_pedestrian (meters)
+        # Bicycle options
+        compute_bike_trip: bool | None = None,  # compute_monomodal_trip_bicycle
+        max_bike_time: int | None = None,  # max_time_bicycle (minutes)
+        min_bike_distance: int | None = None,  # min_length_bicycle (meters)
+        max_bike_distance: int | None = None,  # max_length_bicycle (meters)
+        # Walk-only option
+        compute_walk_trip: bool | None = None,  # compute_monomodal_trip_pedestrian
     ) -> UrlParams:
-        """returns url and params to request journey planner API"""
+        """
+        Build request parameters for journey planner API.
+
+        Args:
+            origin: Origin location (stop ID or coordinates)
+            destination: Destination location (stop ID or coordinates)
+            calc_number_of_trips: Number of trips to calculate (1-3)
+            via: Optional stop to route through
+            not_via: Optional stop to avoid
+            dwell_time: Extra waiting time at via stop
+            language: Response language (sv/en)
+            max_changes: Maximum number of interchanges (0-9)
+            route_type: Optimization preference (leasttime/leastinterchange/leastwalking)
+            include_coordinates: Include coordinate sequences for trip legs
+            departure_date: Date of departure/arrival
+            departure_time: Time of departure/arrival
+            search_for_arrival: If True, search by arrival time instead of departure
+            include_train: Include commuter trains (pendeltåg)
+            include_metro: Include metro (tunnelbana)
+            include_tram: Include tram/local trains (spårväg/lokaltåg)
+            include_bus: Include buses
+            include_ship: Include ships and ferries
+            include_on_demand: Include on-demand transit
+            include_national_train: Include national/long-distance trains
+            include_accessible_bus: Include accessible bus (närtrafik)
+            change_speed: Walking speed percentage (25-400)
+            suppress_alternatives: Suppress alternative/additional trips
+            calc_one_direction: Don't calculate trip before requested time
+            use_nearby_stops: Allow walking to nearby stops
+            max_walk_time: Max time for walking at trip start/end (minutes)
+            max_pedestrian_time: Max time for walk-only trip (minutes)
+            min_walk_distance: Min distance for footpath sections (meters)
+            max_walk_distance: Max distance for footpath sections (meters)
+            compute_bike_trip: Calculate additional bike-only trip
+            max_bike_time: Max time for bike-only trip (minutes)
+            min_bike_distance: Min distance for bike sections (meters)
+            max_bike_distance: Max distance for bike sections (meters)
+            compute_walk_trip: Calculate additional walk-only trip
+
+        Returns:
+            UrlParams ready for search_trip()
+        """
 
         if calc_number_of_trips > 3 or calc_number_of_trips < 1:
             raise ValueError("calc_number_of_trips must be between 1 and 3")
 
-        params = [
+        params: List[tuple[str, Any]] = [
             ("type_origin", origin.type),
             ("name_origin", origin.value),
             ("type_destination", destination.type),
             ("name_destination", destination.value),
-            ("calc_number_of_trips", calc_number_of_trips)
+            ("calc_number_of_trips", calc_number_of_trips),
         ]
 
         if via is not None:
@@ -58,7 +222,103 @@ class JourneyPlannerClient(AsyncClient):
             params.append(("route_type", route_type.value))
 
         if include_coordinates is not None:
-            params.append(("gen_c", 'true' if include_coordinates else 'false'))
+            params.append(("gen_c", "true" if include_coordinates else "false"))
+
+        # Date/time parameters
+        if departure_date is not None:
+            params.append(("itd_date", departure_date.strftime("%Y%m%d")))
+
+        if departure_time is not None:
+            params.append(("itd_time", departure_time.strftime("%H%M")))
+
+        if search_for_arrival:
+            params.append(("itd_trip_date_time_dep_arr", "arr"))
+
+        # Transport mode filters
+        if include_train is not None:
+            params.append(("incl_mot_0", "true" if include_train else "false"))
+
+        if include_metro is not None:
+            params.append(("incl_mot_2", "true" if include_metro else "false"))
+
+        if include_tram is not None:
+            params.append(("incl_mot_4", "true" if include_tram else "false"))
+
+        if include_bus is not None:
+            params.append(("incl_mot_5", "true" if include_bus else "false"))
+
+        if include_ship is not None:
+            params.append(("incl_mot_9", "true" if include_ship else "false"))
+
+        if include_on_demand is not None:
+            params.append(("incl_mot_10", "true" if include_on_demand else "false"))
+
+        if include_national_train is not None:
+            params.append(("incl_mot_14", "true" if include_national_train else "false"))
+
+        if include_accessible_bus is not None:
+            params.append(("incl_mot_19", "true" if include_accessible_bus else "false"))
+
+        # Additional parameters
+        if change_speed is not None:
+            if not 25 <= change_speed <= 400:
+                raise ValueError("change_speed must be between 25 and 400")
+            params.append(("change_speed", change_speed))
+
+        if suppress_alternatives is not None:
+            params.append(("no_alt", "true" if suppress_alternatives else "false"))
+
+        if calc_one_direction is not None:
+            params.append(
+                ("calc_one_direction", "true" if calc_one_direction else "false")
+            )
+
+        if use_nearby_stops is not None:
+            params.append(
+                ("use_prox_foot_search", "true" if use_nearby_stops else "false")
+            )
+
+        # Pedestrian options
+        if max_walk_time is not None:
+            params.append(("tr_it_mot_value100", max_walk_time))
+
+        if max_pedestrian_time is not None:
+            params.append(("max_time_pedestrian", max_pedestrian_time))
+
+        if min_walk_distance is not None:
+            params.append(("min_length_pedestrian", min_walk_distance))
+
+        if max_walk_distance is not None:
+            params.append(("max_length_pedestrian", max_walk_distance))
+
+        # Bicycle options
+        if compute_bike_trip is not None:
+            params.append(
+                (
+                    "compute_monomodal_trip_bicycle",
+                    "true" if compute_bike_trip else "false",
+                )
+            )
+
+        if max_bike_time is not None:
+            params.append(("max_time_bicycle", max_bike_time))
+
+        if min_bike_distance is not None:
+            params.append(("min_length_bicycle", min_bike_distance))
+
+        if max_bike_distance is not None:
+            if max_bike_distance > 1000:
+                raise ValueError("max_bike_distance cannot exceed 1000 meters (API limit)")
+            params.append(("max_length_bicycle", max_bike_distance))
+
+        # Walk-only trip
+        if compute_walk_trip is not None:
+            params.append(
+                (
+                    "compute_monomodal_trip_pedestrian",
+                    "true" if compute_walk_trip else "false",
+                )
+            )
 
         return UrlParams(
             "https://journeyplanner.integration.sl.se/v2/trips",
@@ -66,6 +326,19 @@ class JourneyPlannerClient(AsyncClient):
         )
 
     async def search_trip(self, params: UrlParams) -> List[Journey]:
+        """
+        Search for trips using pre-built parameters.
+
+        Args:
+            params: UrlParams from build_request_params()
+
+        Returns:
+            List of Journey objects
+
+        Raises:
+            OperationFailed: If API returns error messages
+            ResponseFormatChanged: If response format is unexpected
+        """
         response = await self._request_json(params)
 
         if (journeys := response.get("journeys")) is None:
@@ -82,3 +355,33 @@ class JourneyPlannerClient(AsyncClient):
             )
 
         return journeys
+
+    async def get_lines(
+        self,
+        branch_code: int | None = None,
+        merge_directions: bool | None = None,
+    ) -> Dict[str, Any]:
+        """
+        Get list of lines.
+
+        Note: The SL Transport API provides the same functionality in an easier way.
+
+        Args:
+            branch_code: Filter by transport type:
+                1 = Bus, 2 = Metro, 3 = Tram/local train, 4 = Commuter train,
+                5 = Road ferry, 6 = Vessel service, 7 = Taxi, 8 = Accessible bus
+            merge_directions: Merge line directions
+
+        Returns:
+            Dict with 'transportations' key containing line items
+        """
+        params: List[tuple[str, Any]] = [("line_list_subnetwork", "tfs")]
+
+        if branch_code is not None:
+            params.append(("line_list_branch_code", branch_code))
+
+        if merge_directions is not None:
+            params.append(("merge_dir", "true" if merge_directions else "false"))
+
+        args = UrlParams(f"{self.BASE_URL}/line-list", params)
+        return await self._request_json(args)

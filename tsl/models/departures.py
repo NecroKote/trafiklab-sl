@@ -117,6 +117,7 @@ class LineReference(TypedDict):
     id: int
     designation: NotRequired[str]
     transport_mode: NotRequired[TransportMode]
+    transport_authority_id: NotRequired[int]
     group_of_lines: NotRequired[str]
 
 
