@@ -4,6 +4,7 @@ from typing import Any, Dict, Tuple, TypeAlias
 PropertiesType: TypeAlias = Dict[str, Any]
 CoordTuple: TypeAlias = Tuple[float, float]
 
+
 class TransportMode(StrEnum):
     BUS = "BUS"
     METRO = "METRO"
@@ -12,6 +13,7 @@ class TransportMode(StrEnum):
     SHIP = "SHIP"
     FERRY = "FERRY"
     TAXI = "TAXI"
+
 
 class ProductClass(IntEnum):
     TRAIN = 0

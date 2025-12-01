@@ -34,7 +34,7 @@ class JourneyPlannerClient(AsyncClient):
             ("name_origin", origin.value),
             ("type_destination", destination.type),
             ("name_destination", destination.value),
-            ("calc_number_of_trips", calc_number_of_trips)
+            ("calc_number_of_trips", calc_number_of_trips),
         ]
 
         if via is not None:
@@ -58,7 +58,7 @@ class JourneyPlannerClient(AsyncClient):
             params.append(("route_type", route_type.value))
 
         if include_coordinates is not None:
-            params.append(("gen_c", 'true' if include_coordinates else 'false'))
+            params.append(("gen_c", "true" if include_coordinates else "false"))
 
         return UrlParams(
             "https://journeyplanner.integration.sl.se/v2/trips",

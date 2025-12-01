@@ -49,6 +49,7 @@ class SearchLeg:
         """creates SearchLeg from StopFinderType"""
         return cls(SearchType.ANY, stop["id"])
 
+
 class Language(StrEnum):
     """Supported languages for the Journey Planner API."""
 
