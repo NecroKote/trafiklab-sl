@@ -165,7 +165,7 @@ class TransportClient(AsyncClient):
         transport: Optional[TransportMode] = None,
         direction: Optional[int] = None,
         line: Optional[LineId] = None,
-        forecast: int = 60,
+        forecast: Optional[int] = None,
     ) -> UrlParams:
         """
         Build URL parameters for departures request.
@@ -175,7 +175,7 @@ class TransportClient(AsyncClient):
             transport: Filter by transport mode (BUS, TRAM, METRO, TRAIN, FERRY, SHIP, TAXI)
             direction: Filter by line direction code
             line: Filter by line ID (e.g., 17 or "17")
-            forecast: Time window in minutes for departures (default: 60)
+            forecast: Time window in minutes for departures (default: API decides)
 
         Returns:
             UrlParams ready for request
@@ -202,7 +202,7 @@ class TransportClient(AsyncClient):
         transport: Optional[TransportMode] = None,
         direction: Optional[int] = None,
         line: Optional[LineId] = None,
-        forecast: int = 60,
+        forecast: Optional[int] = None,
     ) -> SiteDepartureResponse:
         """
         Get upcoming departures and deviations from a site.
@@ -214,7 +214,7 @@ class TransportClient(AsyncClient):
             transport: Filter by transport mode (BUS, TRAM, METRO, TRAIN, FERRY, SHIP, TAXI)
             direction: Filter by line direction code
             line: Filter by line ID (e.g., 17 or "17")
-            forecast: Time window in minutes (default: 60, max departures still 3 per line)
+            forecast: Time window in minutes (default: API decides, max departures still 3 per line)
 
         Returns:
             SiteDepartureResponse with:
