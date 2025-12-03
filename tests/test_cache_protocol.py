@@ -2,7 +2,7 @@
 
 import pytest
 
-from tsl.helpers import CacheProtocol
+from tsl.helpers import TTL_STATIC, CacheProtocol
 
 
 class MockCache:
@@ -43,7 +43,7 @@ class TestCacheProtocol:
 
     def test_ttl_static_value(self):
         """Test TTL_STATIC is 1 week."""
-        assert CacheProtocol.TTL_STATIC == 604800
+        assert TTL_STATIC == 604800
 
     async def test_mock_cache_operations(self):
         """Test mock cache basic operations."""

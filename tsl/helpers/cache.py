@@ -21,26 +21,14 @@ Example:
 
             async def delete(self, key: str):
                 self._data.pop(key, None)
-
-    Home Assistant example::
-
-        class HACache:
-            def __init__(self, hass):
-                self._data = hass.data.setdefault("tsl_cache", {})
-
-            async def get(self, key: str):
-                return self._data.get(key)
-
-            async def set(self, key: str, value, ttl: int | None = None):
-                self._data[key] = value
-
-            async def delete(self, key: str):
-                self._data.pop(key, None)
 """
 
 from typing import Any, Protocol, runtime_checkable
 
-__all__ = ("CacheProtocol",)
+__all__ = ("CacheProtocol", "TTL_STATIC")
+
+# Suggested TTL values (in seconds)
+TTL_STATIC: int = 604800  # 1 week - for stops/lines that rarely change
 
 
 @runtime_checkable
@@ -53,10 +41,6 @@ class CacheProtocol(Protocol):
 
     The protocol is marked as ``runtime_checkable``, allowing
     isinstance() checks if needed.
-
-    Attributes:
-        TTL_STATIC: Suggested TTL for static data like stops/lines (1 week).
-            Implementations can use this as a hint for cache duration.
 
     Example:
         >>> class MyCache:
@@ -73,9 +57,6 @@ class CacheProtocol(Protocol):
         >>> isinstance(cache, CacheProtocol)
         True
     """
-
-    # Suggested TTL values (in seconds)
-    TTL_STATIC: int = 604800  # 1 week - for stops/lines that rarely change
 
     async def get(self, key: str) -> Any | None:
         """Retrieve a value from the cache.
