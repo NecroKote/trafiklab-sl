@@ -6,6 +6,11 @@ from tsl.models.journey import DwellTime, Journey, Language, RouteType, SearchLe
 from .common import AsyncClient, OperationFailed, ResponseFormatChanged, UrlParams
 
 
+def _str_bool(value: bool) -> str:
+    """Convert boolean to lowercase string for API parameters."""
+    return "true" if value else "false"
+
+
 class SystemValidity(TypedDict):
     """Route planning data availability period."""
 
@@ -226,7 +231,7 @@ class JourneyPlannerClient(AsyncClient):
             params.append(("route_type", route_type.value))
 
         if include_coordinates is not None:
-            params.append(("gen_c", "true" if include_coordinates else "false"))
+            params.append(("gen_c", _str_bool(include_coordinates)))
 
         # Date/time parameters
         if departure_date is not None:
@@ -240,32 +245,28 @@ class JourneyPlannerClient(AsyncClient):
 
         # Transport mode filters
         if include_train is not None:
-            params.append(("incl_mot_0", "true" if include_train else "false"))
+            params.append(("incl_mot_0", _str_bool(include_train)))
 
         if include_metro is not None:
-            params.append(("incl_mot_2", "true" if include_metro else "false"))
+            params.append(("incl_mot_2", _str_bool(include_metro)))
 
         if include_tram is not None:
-            params.append(("incl_mot_4", "true" if include_tram else "false"))
+            params.append(("incl_mot_4", _str_bool(include_tram)))
 
         if include_bus is not None:
-            params.append(("incl_mot_5", "true" if include_bus else "false"))
+            params.append(("incl_mot_5", _str_bool(include_bus)))
 
         if include_ship is not None:
-            params.append(("incl_mot_9", "true" if include_ship else "false"))
+            params.append(("incl_mot_9", _str_bool(include_ship)))
 
         if include_on_demand is not None:
-            params.append(("incl_mot_10", "true" if include_on_demand else "false"))
+            params.append(("incl_mot_10", _str_bool(include_on_demand)))
 
         if include_national_train is not None:
-            params.append(
-                ("incl_mot_14", "true" if include_national_train else "false")
-            )
+            params.append(("incl_mot_14", _str_bool(include_national_train)))
 
         if include_accessible_bus is not None:
-            params.append(
-                ("incl_mot_19", "true" if include_accessible_bus else "false")
-            )
+            params.append(("incl_mot_19", _str_bool(include_accessible_bus)))
 
         # Additional parameters
         if change_speed is not None:
@@ -274,17 +275,13 @@ class JourneyPlannerClient(AsyncClient):
             params.append(("change_speed", change_speed))
 
         if suppress_alternatives is not None:
-            params.append(("no_alt", "true" if suppress_alternatives else "false"))
+            params.append(("no_alt", _str_bool(suppress_alternatives)))
 
         if calc_one_direction is not None:
-            params.append(
-                ("calc_one_direction", "true" if calc_one_direction else "false")
-            )
+            params.append(("calc_one_direction", _str_bool(calc_one_direction)))
 
         if use_nearby_stops is not None:
-            params.append(
-                ("use_prox_foot_search", "true" if use_nearby_stops else "false")
-            )
+            params.append(("use_prox_foot_search", _str_bool(use_nearby_stops)))
 
         # Pedestrian options
         if max_walk_time is not None:
@@ -302,10 +299,7 @@ class JourneyPlannerClient(AsyncClient):
         # Bicycle options
         if compute_bike_trip is not None:
             params.append(
-                (
-                    "compute_monomodal_trip_bicycle",
-                    "true" if compute_bike_trip else "false",
-                )
+                ("compute_monomodal_trip_bicycle", _str_bool(compute_bike_trip))
             )
 
         if max_bike_time is not None:
@@ -324,10 +318,7 @@ class JourneyPlannerClient(AsyncClient):
         # Walk-only trip
         if compute_walk_trip is not None:
             params.append(
-                (
-                    "compute_monomodal_trip_pedestrian",
-                    "true" if compute_walk_trip else "false",
-                )
+                ("compute_monomodal_trip_pedestrian", _str_bool(compute_walk_trip))
             )
 
         return UrlParams(
@@ -391,7 +382,7 @@ class JourneyPlannerClient(AsyncClient):
             params.append(("line_list_branch_code", branch_code))
 
         if merge_directions is not None:
-            params.append(("merge_dir", "true" if merge_directions else "false"))
+            params.append(("merge_dir", _str_bool(merge_directions)))
 
         args = UrlParams(f"{self.BASE_URL}/line-list", params)
         return await self._request_json(args)

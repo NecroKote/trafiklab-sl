@@ -1,6 +1,6 @@
 """Tests for JourneyPlannerClient functionality."""
 
-from datetime import date, time
+from datetime import date, time, timedelta
 
 import aiohttp
 import pytest
@@ -98,7 +98,7 @@ class TestBuildRequestParams:
         """Test dwell time parameter."""
         origin = SearchLeg(type="any", value="origin")
         dest = SearchLeg(type="any", value="dest")
-        dwell = DwellTime(hours=0, minutes=15)
+        dwell = DwellTime(timedelta(minutes=15))
 
         params = JourneyPlannerClient.build_request_params(
             origin, dest, dwell_time=dwell
@@ -139,7 +139,7 @@ class TestBuildRequestParams:
         )
         param_dict = dict(params.params)
 
-        assert param_dict["route_type"] == "LEASTWALKING"
+        assert param_dict["route_type"] == "leastwalking"
 
     def test_include_coordinates(self):
         """Test include_coordinates parameter."""
