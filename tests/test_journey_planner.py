@@ -6,7 +6,7 @@ import aiohttp
 import pytest
 
 from tsl.clients.journey import JourneyPlannerClient
-from tsl.models.journey import DwellTime, Language, RouteType, SearchLeg
+from tsl.models.journey import DwellTime, Language, RouteType, SearchLeg, StopFilter
 
 
 @pytest.fixture
@@ -316,7 +316,7 @@ async def test_get_system_info(session):
 async def test_find_stops(session):
     """Test find_stops endpoint."""
     client = JourneyPlannerClient(session)
-    stops = await client.find_stops(SearchLeg.from_any("odenplan"))
+    stops = await client.find_stops("odenplan")
 
     assert isinstance(stops, list)
     assert len(stops) > 0
@@ -325,6 +325,27 @@ async def test_find_stops(session):
     assert "id" in stop
     assert "name" in stop
     assert stop["type"] == "stop"
+
+
+@pytest.mark.integration
+async def test_find_stops_by_coordinates_quirk(session):
+    """
+    Test find_stops by coordinates quirk - when searching by coordinates
+    "stop"'s are not returned.
+    """
+    client = JourneyPlannerClient(session)
+    results = await client.find_stops(
+        SearchLeg.from_coordinates("59.34299", "18.04966"),
+        filter=StopFilter.STOPS | StopFilter.POI,
+    )
+
+    assert isinstance(results, list)
+    assert len(results) > 0
+
+    result = results[0]
+    assert "id" in result
+    assert "name" in result
+    assert result["type"] != "stop"
 
 
 @pytest.mark.integration

@@ -52,28 +52,30 @@ class JourneyPlannerClient(AsyncClient):
         )
 
     async def find_stops(
-        self, query: SearchLeg, filter: StopFilter = StopFilter.STOPS
+        self, query: str | SearchLeg, filter: StopFilter = StopFilter.STOPS
     ) -> List[StopFinderType]:
         """
-        Search for stops, addresses, or points of interest by name.
-
-        This is useful for autocomplete/dropdown functionality when users
-        need to select a stop for journey planning.
+        Search for stops, addresses, or points of interest by name or coordinates.
 
         Args:
-            query: Search query (e.g., "odenplan", "t-centralen")
+            query: Search query (e.g., "odenplan", "t-centralen"), or SearchLeg
             filter: allows limiting results to specific types (default: stops only)
+
+        **WARNING**: the API may ignore `filter` when querying by coordinates
 
         Returns:
             List of StopLocation objects sorted by match quality
 
         Example:
-            stops = await client.find_stops(SearchLeg.from_any("odenplan"))
+            stops = await client.find_stops("odenplan")
             # Use SearchLeg.from_stop_finder(stops[0]) for journey planning
         """
 
+        if isinstance(query, str):
+            query = SearchLeg.from_any(query)
+
         params: List[tuple[str, Any]] = [
-            ("any_obj_filter_sf", str(filter.value)),
+            ("any_obj_filter_sf", filter.value),
         ]
 
         if query.type == SearchType.COORD:
@@ -90,7 +92,8 @@ class JourneyPlannerClient(AsyncClient):
             raise ResponseFormatChanged("'ResponseData' not found in response")
 
         locations = cast(List[StopFinderType], locations)
-        return sorted(locations, key=lambda x: x["matchQuality"], reverse=True)
+        # use matchQuality for sorting if available
+        return sorted(locations, key=lambda x: x.get("matchQuality", 0), reverse=True)
 
     @classmethod
     def build_request_params(

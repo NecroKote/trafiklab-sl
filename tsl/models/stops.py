@@ -56,7 +56,7 @@ class StopFinderType(TypedDict):
     buildingNumber: NotRequired[str]
 
     # Quality of the query matching.
-    matchQuality: int
+    matchQuality: NotRequired[int]
 
     # Products at this stop
     productClasses: NotRequired[List[ProductClass]]
