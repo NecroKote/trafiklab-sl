@@ -1,4 +1,4 @@
-from typing import List, TypedDict, NotRequired
+from typing import List, NotRequired, TypedDict
 
 ValidityPeriod = TypedDict(
     "ValidityPeriod",

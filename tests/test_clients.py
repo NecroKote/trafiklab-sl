@@ -1,6 +1,7 @@
+import sys
+
 import aiohttp
 import pytest
-import sys
 
 from tsl.clients.deviations import DeviationsClient
 from tsl.clients.stoplookup import StopLookupClient
@@ -39,7 +40,6 @@ async def test_transport_departures(session):
             assert departure["state"] in DepartureState._value2member_map_
         else:
             assert departure["state"] in DepartureState
-
 
 
 @pytest.mark.integration

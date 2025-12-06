@@ -22,13 +22,15 @@ Example:
         await lines.preload()
 """
 
-from .cache import CacheProtocol
+from .cache import CacheProtocol, TTL_STATIC
 from .lines import LineHelper, LineInfo
-from .search import SearchMode
+from .search import SearchMode, search
 
-__all__ = [
+__all__ = (
     "CacheProtocol",
+    "TTL_STATIC", 
     "LineHelper",
     "LineInfo",
     "SearchMode",
-]
+    "search",
+)

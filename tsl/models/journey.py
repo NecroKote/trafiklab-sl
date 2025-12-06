@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import timedelta
-from enum import StrEnum
+from enum import IntFlag, StrEnum
 from typing import Any, List, NotRequired, Tuple, TypedDict
 
 from .common import CoordTuple, ProductClass, PropertiesType
@@ -48,6 +48,16 @@ class SearchLeg:
     def from_stop_finder(cls, stop: StopFinderType) -> "SearchLeg":
         """creates SearchLeg from StopFinderType"""
         return cls(SearchType.ANY, stop["id"])
+
+
+class StopFilter(IntFlag):
+    """Filter for JourneyPlanner's stop finder feature."""
+
+    STOPS = 2
+    STREET = 4
+    ADDRESS = 8
+    POI = 32
+
 
 class Language(StrEnum):
     """Supported languages for the Journey Planner API."""

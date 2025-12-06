@@ -2,7 +2,7 @@
 https://www.trafiklab.se/api/trafiklab-apis/sl/deviations
 """
 
-from typing import List, Optional, TypedDict, NotRequired
+from typing import List, NotRequired, Optional, TypedDict
 
 from .common import TransportMode
 
@@ -58,6 +58,13 @@ class Scope(TypedDict):
     lines: NotRequired[List[Line]]
 
 
+class DeviationCategory(TypedDict):
+    """Category of the deviation (e.g., FACILITY/LIFT)"""
+
+    group: str
+    type: str
+
+
 class Deviation(TypedDict):
     """information regarding deviations on SLs transport network."""
 
@@ -66,6 +73,7 @@ class Deviation(TypedDict):
     publish: Publish
     priority: Priority
     message_variants: List[MessageVariant]
-    modified: str
+    modified: NotRequired[str]
     deviation_case_id: NotRequired[int]
     scope: NotRequired[Scope]
+    categories: NotRequired[List[DeviationCategory]]
