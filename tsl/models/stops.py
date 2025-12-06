@@ -14,12 +14,23 @@ class StopFinderResultType(StrEnum):
 
 
 class StopArea(TypedDict):
+    """Area location information for a stop."""
+
     id: str
     name: str
     type: str
 
 
+class StopProperties(TypedDict, total=False):
+    """Additional properties for a stop."""
+
+    mainLocality: str
+    stopId: str
+
+
 class StopFinderType(TypedDict):
+    """Stop location from stop-finder endpoint."""
+
     # The id of the search result.
     id: str
 
@@ -52,3 +63,6 @@ class StopFinderType(TypedDict):
 
     # Principality of the stop or stop area.
     parent: StopArea
+
+    # Additional properties of the stop.
+    properties: NotRequired[StopProperties]

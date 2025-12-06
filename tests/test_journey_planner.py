@@ -316,7 +316,7 @@ async def test_get_system_info(session):
 async def test_find_stops(session):
     """Test find_stops endpoint."""
     client = JourneyPlannerClient(session)
-    stops = await client.find_stops("odenplan")
+    stops = await client.find_stops(SearchLeg.from_any("odenplan"))
 
     assert isinstance(stops, list)
     assert len(stops) > 0
@@ -331,7 +331,7 @@ async def test_find_stops(session):
 async def test_find_stops_known_stop(session):
     """Test find_stops returns expected result for known stop."""
     client = JourneyPlannerClient(session)
-    stops = await client.find_stops("t-centralen")
+    stops = await client.find_stops(SearchLeg.from_any("t-centralen"))
 
     assert len(stops) > 0
     # T-Centralen should be in results

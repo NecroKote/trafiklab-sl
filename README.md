@@ -42,7 +42,6 @@ Here is an example of how to use the client to get upcoming train departures at 
 import asyncio
 import aiohttp
 
-from tsl.clients.stoplookup import StopLookupClient
 from tsl.clients.transport import TransportClient
 from tsl.clients.journey import JourneyPlannerClient, SearchLeg
 from tsl.models.common import TransportMode
@@ -54,8 +53,8 @@ async def main():
     async with aiohttp.ClientSession() as session:
 
         # perform stop lookup to get the site id for Stockholm Central
-        lookup_client = StopLookupClient(session)
-        stops = await lookup_client.get_stops("Stockholm Central")
+        journey_client = JourneyPlannerClient(session)
+        stops = await journey_client.find_stops(SearchLeg.from_any("Stockholm Central"))
         if (central_station := next(iter(stops), None)) is None:
             raise RuntimeError(r"Could not find Stockholm Central. Weird ¯\_(ツ)_/¯")
 
@@ -67,13 +66,12 @@ async def main():
         reponse = await client.get_site_departures(transport_api_siteid, transport=TransportMode.TRAIN)
 
         # get step by step journey from Stockholm Central to a specific location
-        route_client = JourneyPlannerClient(session)
-        params = route_client.build_request_params(
+        params = journey_client.build_request_params(
             origin=SearchLeg.from_stop_finder(central_station),
             destination=SearchLeg.from_coordinates("59.274695", "18.033901"),
             calc_number_of_trips=1
         )
-        ways_to_get_there = await route_client.search_trip(params)
+        ways_to_get_there = await journey_client.search_trip(params)
         # use `SimpleJourneyInterpreter` to interpret the journey data in a human-readable way
 
     print(f"Upcoming trains at {central_station['disassembledName']}:")
