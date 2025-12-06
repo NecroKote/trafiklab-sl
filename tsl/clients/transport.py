@@ -151,7 +151,7 @@ class TransportClient(AsyncClient):
         if expand:
             params["expand"] = "true"
 
-        args = UrlParams(f"{self.BASE_URL}/sites", params if params else None)
+        args = UrlParams(f"{self.BASE_URL}/sites", params or None)
         response = await self._request_json(args)
         return cast(List[Site], response)
 
@@ -159,8 +159,9 @@ class TransportClient(AsyncClient):
     # Departures endpoint
     # -------------------------------------------------------------------------
 
-    @staticmethod
+    @classmethod
     def get_departures_url_params(
+        cls,
         site_id: int,
         transport: Optional[TransportMode] = None,
         direction: Optional[int] = None,
@@ -180,10 +181,7 @@ class TransportClient(AsyncClient):
         Returns:
             UrlParams ready for request
         """
-        url = (
-            "https://transport.integration.sl.se"
-            f"/v1/sites/{quote(str(site_id))}/departures"
-        )
+        url = f"{cls.BASE_URL}/sites/{quote(str(site_id))}/departures"
         params: dict[str, Any] = {}
         if transport is not None:
             params["transport"] = transport.value
