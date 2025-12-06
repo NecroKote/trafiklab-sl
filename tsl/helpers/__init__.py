@@ -24,13 +24,15 @@ Example:
         await stops.preload()
 """
 
-from .cache import CacheProtocol
-from .search import SearchMode
+from .cache import CacheProtocol, TTL_STATIC
+from .search import SearchMode, search
 from .stops import StopHelper, StopInfo
 
-__all__ = [
+__all__ = (
     "CacheProtocol",
+    "TTL_STATIC",
     "SearchMode",
+    "search", 
     "StopHelper",
     "StopInfo",
-]
+)
