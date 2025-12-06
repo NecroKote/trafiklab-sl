@@ -1,5 +1,5 @@
 from enum import StrEnum
-from typing import List, TypedDict, NotRequired
+from typing import List, NotRequired, TypedDict
 
 from .common import CoordTuple, ProductClass
 

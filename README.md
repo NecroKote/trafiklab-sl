@@ -97,3 +97,27 @@ asyncio.run(main())
 ## Contributing
 
 Both bug reports and pull requests are appreciated.
+
+
+## Development
+
+### pre-commit hooks
+
+To help ensure code style and import order are consistent across the project, this project uses [pre-commit](https://pre-commit.com/) to automatically check and format code before it reaches the repository.
+
+This project uses [pre-commit](https://pre-commit.com/) to automatically check and format code before it reaches the repository.
+
+To set up pre-commit hooks locally:
+
+```sh
+pip install pre-commit
+pre-commit install
+```
+
+After this, every time you commit, formatting tools will be run automatically on your code.
+
+You can also run all hooks manually on all files with:
+
+```sh
+pre-commit run --all-files
+```

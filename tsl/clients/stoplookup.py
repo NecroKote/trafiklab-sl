@@ -1,5 +1,5 @@
-from typing import List, cast
 from enum import IntFlag
+from typing import List, cast
 
 from ..models.stops import StopFinderType
 from .common import AsyncClient, ResponseFormatChanged, UrlParams
@@ -11,6 +11,7 @@ class Filter(IntFlag):
     ADDRESS = 8
     POI = 32
 
+
 class StopLookupClient(AsyncClient):
     """
     client for SL Stop Lookup API
@@ -18,7 +19,9 @@ class StopLookupClient(AsyncClient):
     """
 
     @staticmethod
-    def _get_request_url_params(search_string: str, filter: Filter = Filter.STOPS) -> UrlParams:
+    def _get_request_url_params(
+        search_string: str, filter: Filter = Filter.STOPS
+    ) -> UrlParams:
         """returns url and params to request stops"""
 
         params = [
@@ -54,5 +57,7 @@ class StopLookupClient(AsyncClient):
         Get street or address by search string
         """
 
-        args = self._get_request_url_params(search_string, filter=Filter.STREET | Filter.ADDRESS)
+        args = self._get_request_url_params(
+            search_string, filter=Filter.STREET | Filter.ADDRESS
+        )
         return await self._request_matches(args)
