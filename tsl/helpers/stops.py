@@ -29,6 +29,7 @@ import aiohttp
 
 from ..clients.journey import JourneyPlannerClient
 from ..clients.transport import TransportClient
+from ..models.journey import SearchLeg
 from ..tools.stop_ids import global_id_to_site_id, site_id_to_global_id
 from .cache import CacheProtocol
 from .search import SearchMode, search
@@ -229,7 +230,7 @@ class StopHelper:
         if not query:
             return []
 
-        results = await self._journey.find_stops(query)
+        results = await self._journey.find_stops(SearchLeg.from_any(query))
         stops: List[StopInfo] = []
 
         for loc in results[:limit]:
