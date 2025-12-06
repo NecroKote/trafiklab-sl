@@ -25,10 +25,7 @@ Example:
 
 from typing import Any, Protocol, runtime_checkable
 
-__all__ = ("CacheProtocol", "TTL_STATIC")
-
-# Suggested TTL values (in seconds)
-TTL_STATIC: int = 604800  # 1 week - for stops/lines that rarely change
+__all__ = ("CacheProtocol",)
 
 
 @runtime_checkable

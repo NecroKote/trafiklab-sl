@@ -1,11 +1,10 @@
-"""Helper utilities for SL data.
+"""Helper utilities for SL data."""
 
-This module provides the CacheProtocol interface for optional caching support.
-"""
+from .cache import CacheProtocol
+from .search import SearchMode, search
 
-from .cache import TTL_STATIC, CacheProtocol
-
-__all__ = [
+__all__ = (
     "CacheProtocol",
-    "TTL_STATIC",
-]
+    "SearchMode",
+    "search",
+)

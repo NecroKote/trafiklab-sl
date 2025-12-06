@@ -1,8 +1,6 @@
 """Tests for CacheProtocol."""
 
-import pytest
-
-from tsl.helpers import TTL_STATIC, CacheProtocol
+from tsl.helpers import CacheProtocol
 
 
 class MockCache:
@@ -40,10 +38,6 @@ class TestCacheProtocol:
 
         cache = IncompleteCache()
         assert not isinstance(cache, CacheProtocol)
-
-    def test_ttl_static_value(self):
-        """Test TTL_STATIC is 1 week."""
-        assert TTL_STATIC == 604800
 
     async def test_mock_cache_operations(self):
         """Test mock cache basic operations."""
