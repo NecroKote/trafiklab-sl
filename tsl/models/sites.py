@@ -1,39 +1,32 @@
 from typing import List, NotRequired, TypedDict
 
-ValidityPeriod = TypedDict(
-    "ValidityPeriod",
-    {
-        "from": str,
-        "to": NotRequired[str],
-    },
-)
-"""The period for which the object is valid"""
+from .common import ValidityPeriod
 
 
 class Site(TypedDict):
-    # Unique identifier of a site
     id: int
+    """Unique identifier of a site"""
 
-    # Global unique site identifier
     gid: int
+    """Global unique site identifier"""
 
-    # The name of the site generaly known to the public
     name: str
+    """The name of the site generaly known to the public"""
 
-    # The period for which the object is valid.
-    valid: ValidityPeriod
-
-    # Alias names that describes the same place but with a different name
     alias: NotRequired[List[str]]
+    """Alias names that describes the same place but with a different name"""
 
-    # An abbreviation for the site
     abbreviation: NotRequired[str]
+    """An abbreviation for the site"""
 
-    # Additional note related to the site
     note: NotRequired[str]
+    """Additional note related to the site"""
 
-    # WGS84 latitude in decimal degrees
     lat: NotRequired[float]
+    """WGS84 latitude in decimal degrees"""
 
-    # WGS84 longitude in decimal degrees
     lon: NotRequired[float]
+    """WGS84 longitude in decimal degrees"""
+
+    valid: ValidityPeriod
+    """The period for which the object is valid."""

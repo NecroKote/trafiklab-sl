@@ -1,13 +1,10 @@
-from typing import List, Optional, Union, cast
+from typing import List, Optional, cast
 
+from ..models.common import LineId
 from ..models.deviations import Deviation, TransportMode
 from .common import AsyncClient, UrlParams
 
 __all__ = ("DeviationsClient",)
-
-# Line IDs are numeric but can be passed as int or str (e.g., 176 or "176")
-# Note: Express variants like "176X" are trip variants, not separate line IDs
-LineId = Union[str, int]
 
 
 class DeviationsClient(AsyncClient):

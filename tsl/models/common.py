@@ -1,5 +1,5 @@
 from enum import IntEnum, StrEnum
-from typing import Any, Dict, Tuple, TypeAlias
+from typing import Any, Dict, NotRequired, Tuple, TypeAlias, TypedDict, Union
 
 PropertiesType: TypeAlias = Dict[str, Any]
 CoordTuple: TypeAlias = Tuple[float, float]
@@ -28,3 +28,26 @@ class ProductClass(IntEnum):
 
     FOOT_PATH = 100
     FOOT_PATH_LOCAL = 99
+
+
+LineId = Union[str, int]
+"""
+Line IDs are numeric but can be passed as int or str (e.g., 176 or "176")
+
+Note: Express variants like "176X" are trip variants, not separate line IDs
+"""
+
+LocalDateString: TypeAlias = str
+"""
+The field's format is 'yyyy-MM-ddTHH:mm:ss' (ISO8601:2004)
+in the local Europe/Stockholm timezone
+"""
+
+ValidityPeriod = TypedDict(
+    "ValidityPeriod",
+    {
+        "from": LocalDateString,
+        "to": NotRequired[LocalDateString],
+    },
+)
+"""The period for which the object is valid"""

@@ -90,7 +90,7 @@ async def test_get_lines(session):
 
     assert isinstance(lines, dict)
     # Should have transport mode categories
-    possible_keys = ["metro", "tram", "train", "bus", "ship", "ferry", "taxi"]
+    possible_keys = TransportMode._member_map_.keys()
     assert any(key in lines for key in possible_keys)
 
 

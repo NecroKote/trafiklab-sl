@@ -1,98 +1,13 @@
-from typing import Any, Dict, List, Optional, TypedDict, Union, cast
+from typing import Any, Dict, List, Optional, cast
 from urllib.parse import quote
 
+from ..models.common import LineId
 from ..models.departures import SiteDepartureResponse, TransportMode
 from ..models.sites import Site
-from .common import AsyncClient, UrlParams
+from ..models.transport import Line, LinesResponse, StopPoint, TransportAuthority
+from .common import AsyncClient, ResponseFormatChanged, UrlParams
 
 __all__ = ("TransportClient",)
-
-# Line IDs are numeric but can be passed as int or str (e.g., 176 or "176")
-LineId = Union[str, int]
-
-
-class TransportAuthority(TypedDict):
-    """Transport authority reference."""
-
-    id: int
-    name: str
-
-
-class TransportAuthorityFull(TypedDict, total=False):
-    """Full transport authority information."""
-
-    id: int
-    gid: int
-    name: str
-    formal_name: str
-    code: str
-    street: str
-    postal_code: int
-    city: str
-    country: str
-    valid: Dict[str, str]
-
-
-class Contractor(TypedDict):
-    """Line contractor information."""
-
-    id: int
-    name: str
-
-
-class Line(TypedDict, total=False):
-    """Line information from the lines endpoint."""
-
-    id: int
-    gid: int
-    name: str
-    designation: str
-    transport_mode: str
-    group_of_lines: str
-    transport_authority: TransportAuthority
-    contractor: Contractor
-    valid: Dict[str, str]
-
-
-class LinesResponse(TypedDict, total=False):
-    """Response from /lines endpoint, grouped by transport mode."""
-
-    metro: List[Line]
-    tram: List[Line]
-    train: List[Line]
-    bus: List[Line]
-    ship: List[Line]
-    ferry: List[Line]
-    taxi: List[Line]
-
-
-class StopArea(TypedDict, total=False):
-    """Stop area information."""
-
-    id: int
-    name: str
-    sname: str
-    type: str
-
-
-class StopPoint(TypedDict, total=False):
-    """Stop point information from the stop-points endpoint."""
-
-    id: int
-    gid: int
-    pattern_point_gid: int
-    name: str
-    sname: str
-    designation: str
-    local_num: int
-    type: str
-    has_entrance: bool
-    lat: float
-    lon: float
-    door_orientation: float
-    transport_authority: TransportAuthority
-    stop_area: StopArea
-    valid: Dict[str, str]
 
 
 class TransportClient(AsyncClient):
@@ -110,54 +25,6 @@ class TransportClient(AsyncClient):
     """
 
     BASE_URL = "https://transport.integration.sl.se/v1"
-
-    # -------------------------------------------------------------------------
-    # Lines endpoint
-    # -------------------------------------------------------------------------
-
-    async def get_lines(self, transport_authority_id: int = 1) -> LinesResponse:
-        """
-        List all lines within Region Stockholm.
-
-        Args:
-            transport_authority_id: Filter by transport authority (default: 1 for SL)
-
-        Returns:
-            LinesResponse with lines grouped by transport mode:
-            - metro, tram, train, bus, ship, ferry, taxi
-        """
-        args = UrlParams(
-            f"{self.BASE_URL}/lines",
-            {"transport_authority_id": transport_authority_id},
-        )
-        response = await self._request_json(args)
-        return cast(LinesResponse, response)
-
-    # -------------------------------------------------------------------------
-    # Sites endpoint
-    # -------------------------------------------------------------------------
-
-    async def get_sites(self, expand: bool = False) -> List[Site]:
-        """
-        List all sites within Region Stockholm.
-
-        Args:
-            expand: If True, expand referenced objects (affects response time/size)
-
-        Returns:
-            List of Site objects with id, gid, name, lat, lon, stop_areas, valid period
-        """
-        params: Dict[str, Any] = {}
-        if expand:
-            params["expand"] = "true"
-
-        args = UrlParams(f"{self.BASE_URL}/sites", params or None)
-        response = await self._request_json(args)
-        return cast(List[Site], response)
-
-    # -------------------------------------------------------------------------
-    # Departures endpoint
-    # -------------------------------------------------------------------------
 
     @classmethod
     def get_departures_url_params(
@@ -226,41 +93,80 @@ class TransportClient(AsyncClient):
         response = await self._request_json(args)
         return cast(SiteDepartureResponse, response)
 
-    # -------------------------------------------------------------------------
-    # Stop Points endpoint
-    # -------------------------------------------------------------------------
+    async def get_transport_authorities(self) -> List[TransportAuthority]:
+        """
+        List all transport authorities within Region Stockholm.
+
+        Returns:
+            List of TransportAuthority objects
+        """
+        args = UrlParams(f"{self.BASE_URL}/transport-authorities", None)
+        response = await self._request_json(args)
+        return cast(List[TransportAuthority], response)
+
+    async def get_lines(
+        self, transport_authority_id: int = 1
+    ) -> Dict[TransportMode, List[Line]]:
+        """
+        List all lines within Region Stockholm.
+
+        Args:
+            transport_authority_id: Filter by transport authority (default: 1 for SL)
+
+        Returns:
+            dict with lines grouped by TransportMode
+        """
+        args = UrlParams(
+            f"{self.BASE_URL}/lines",
+            {"transport_authority_id": transport_authority_id},
+        )
+        response = await self._request_json(args)
+        lines = cast(LinesResponse, response)
+
+        try:
+            result = {
+                TransportMode.METRO: lines["metro"],
+                TransportMode.TRAM: lines["tram"],
+                TransportMode.TRAIN: lines["train"],
+                TransportMode.BUS: lines["bus"],
+                TransportMode.SHIP: lines["ship"],
+                TransportMode.FERRY: lines["ferry"],
+                TransportMode.TAXI: lines["taxi"],
+            }
+        except KeyError as e:
+            raise ResponseFormatChanged(f"Missing expected key in lines response: {e}")
+
+        return result
+
+    async def get_sites(self, expand: bool = False) -> List[Site]:
+        """
+        List all sites within Region Stockholm.
+
+        **WARNING**: This endpoint returns a large amount of data.
+
+        Args:
+            expand: If True, expand referenced objects (affects response time/size)
+
+        Returns:
+            List of Site objects
+        """
+        params: Dict[str, Any] = {}
+        if expand:
+            params["expand"] = "true"
+
+        args = UrlParams(f"{self.BASE_URL}/sites", params or None)
+        response = await self._request_json(args)
+        return cast(List[Site], response)
 
     async def get_stop_points(self) -> List[StopPoint]:
         """
         List all stop points (platforms) within Region Stockholm.
 
+        **WARNING**: This endpoint returns a large amount of data.
+
         Returns:
-            List of StopPoint objects with:
-            - id, gid, pattern_point_gid
-            - name, sname, designation
-            - type (PLATFORM, etc.)
-            - lat, lon, door_orientation
-            - transport_authority, stop_area
-            - valid period
+            List of StopPoint objects
         """
         args = UrlParams(f"{self.BASE_URL}/stop-points", None)
         response = await self._request_json(args)
         return cast(List[StopPoint], response)
-
-    # -------------------------------------------------------------------------
-    # Transport Authorities endpoint
-    # -------------------------------------------------------------------------
-
-    async def get_transport_authorities(self) -> List[TransportAuthorityFull]:
-        """
-        List all transport authorities within Region Stockholm.
-
-        Returns:
-            List of TransportAuthorityFull objects with:
-            - id, gid, name, formal_name
-            - code, street, postal_code, city, country
-            - valid period
-        """
-        args = UrlParams(f"{self.BASE_URL}/transport-authorities", None)
-        response = await self._request_json(args)
-        return cast(List[TransportAuthorityFull], response)
