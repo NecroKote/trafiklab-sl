@@ -1,9 +1,9 @@
 from typing import List
-from warnings import deprecated
 
 from ..models.journey import SearchLeg, StopFilter
 from ..models.stops import StopFinderType
 from .journey import JourneyPlannerClient
+from .utils import deprecated
 
 
 @deprecated("Use JourneyPlannerClient.find_stops() instead")
