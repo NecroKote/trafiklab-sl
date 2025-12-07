@@ -3,24 +3,6 @@
 This module defines a cache interface using Python's Protocol type.
 The library does not include cache implementations - clients can provide
 their own cache that implements this protocol.
-
-Example:
-    Implementing a simple cache::
-
-        from tsl.helpers import CacheProtocol
-
-        class MyCache:
-            def __init__(self):
-                self._data = {}
-
-            async def get(self, key: str):
-                return self._data.get(key)
-
-            async def set(self, key: str, value, ttl: int | None = None):
-                self._data[key] = value
-
-            async def delete(self, key: str):
-                self._data.pop(key, None)
 """
 
 from typing import Any, Protocol, runtime_checkable
