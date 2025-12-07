@@ -306,10 +306,11 @@ async def test_get_system_info(session):
     client = JourneyPlannerClient(session)
     info = await client.get_system_info()
 
-    assert "from_date" in info
-    assert "to_date" in info
-    assert isinstance(info["from_date"], str)
-    assert isinstance(info["to_date"], str)
+    if info:
+        assert "from" in info
+        assert "to" in info
+        assert isinstance(info["from"], str)
+        assert isinstance(info["to"], str)
 
 
 @pytest.mark.integration

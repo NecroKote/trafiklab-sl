@@ -1,10 +1,22 @@
 from dataclasses import dataclass
 from datetime import timedelta
 from enum import IntFlag, StrEnum
-from typing import Any, List, NotRequired, Tuple, TypedDict
+from typing import Any, List, NotRequired, Tuple, TypeAlias, TypedDict
 
 from .common import CoordTuple, ProductClass, PropertiesType
 from .stops import StopFinderType
+
+DateStr: TypeAlias = str
+"""Date string in format 'YYYY-MM-DD'."""
+
+SystemValidity = TypedDict(
+    "SystemValidity",
+    {
+        "from": DateStr,
+        "to": DateStr,
+    },
+)
+"""Route planning data availability period."""
 
 
 class SearchType(StrEnum):

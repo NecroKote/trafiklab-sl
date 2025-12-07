@@ -1,5 +1,5 @@
 from datetime import date, time
-from typing import Any, Dict, List, TypedDict, cast
+from typing import Any, Dict, List, cast
 
 from tsl.models.journey import (
     DwellTime,
@@ -9,6 +9,7 @@ from tsl.models.journey import (
     SearchLeg,
     SearchType,
     StopFilter,
+    SystemValidity,
 )
 from tsl.models.stops import StopFinderType
 
@@ -20,13 +21,6 @@ def _str_bool(value: bool) -> str:
     return "true" if value else "false"
 
 
-class SystemValidity(TypedDict):
-    """Route planning data availability period."""
-
-    from_date: str  # renamed from 'from' which is a Python keyword
-    to_date: str  # renamed from 'to'
-
-
 class JourneyPlannerClient(AsyncClient):
     """
     client for SL Journey Planner v2 API
@@ -35,7 +29,7 @@ class JourneyPlannerClient(AsyncClient):
 
     BASE_URL = "https://journeyplanner.integration.sl.se/v2"
 
-    async def get_system_info(self) -> SystemValidity:
+    async def get_system_info(self) -> SystemValidity | None:
         """
         Get route planning data availability period.
 
@@ -45,11 +39,8 @@ class JourneyPlannerClient(AsyncClient):
         args = UrlParams(f"{self.BASE_URL}/system-info", None)
         response = await self._request_json(args)
 
-        validity = response.get("validity", {})
-        return SystemValidity(
-            from_date=validity.get("from", ""),
-            to_date=validity.get("to", ""),
-        )
+        if validity := response.get("validity"):
+            return cast(SystemValidity, validity)
 
     async def find_stops(
         self, query: str | SearchLeg, filter: StopFilter = StopFilter.STOPS
