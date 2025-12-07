@@ -30,9 +30,14 @@ The library supports following SL APIs:
 - [SL Transport API](https://www.trafiklab.se/api/our-apis/sl/transport/)
   - "Departures from Site"
   - "Sites"
+  - "Lines"
+  - "Sites"
+  - "Stop Points"
 - [SL Journey-planner v2 API](https://www.trafiklab.se/api/our-apis/sl/journey-planner-2/)
   - "Stop lookup"
   - "Journey Planner"
+  - "System Info"
+  - "Line list" (the use is discouraged, use Transport API Lines instead)
 
 ## Example
 
@@ -54,7 +59,7 @@ async def main():
 
         # perform stop lookup to get the site id for Stockholm Central
         journey_client = JourneyPlannerClient(session)
-        stops = await journey_client.find_stops(SearchLeg.from_any("Stockholm Central"))
+        stops = await journey_client.find_stops("Stockholm Central")
         if (central_station := next(iter(stops), None)) is None:
             raise RuntimeError(r"Could not find Stockholm Central. Weird ¯\_(ツ)_/¯")
 
