@@ -16,15 +16,16 @@ T = TypeVar("T")
 class SearchMode(Enum):
     """Available search modes."""
 
-    SUBSTRING = "substring"  # Simple case-insensitive substring matching
-    FUZZY = "fuzzy"  # Levenshtein-based fuzzy matching
+    SUBSTRING = "substring"
+    """Simple case-insensitive substring matching"""
+
+    FUZZY = "fuzzy"
+    """Levenshtein-based fuzzy matching"""
 
 
 def _levenshtein_distance(s1: str, s2: str) -> int:
-    """Calculate Levenshtein (edit) distance between two strings.
+    """Calculate Levenshtein (edit) distance between two strings."""
 
-    This is a simple dynamic programming implementation.
-    """
     if len(s1) < len(s2):
         return _levenshtein_distance(s2, s1)
 
@@ -197,6 +198,6 @@ def search(
     """
     if mode == SearchMode.FUZZY:
         threshold = kwargs.get("threshold", 0.6)
-        return fuzzy_search(items, query, key_fn, limit=limit, threshold=threshold)
+        return fuzzy_search(items, query, key_fn, limit, threshold=threshold)
     else:
-        return substring_search(items, query, key_fn, limit=limit)
+        return substring_search(items, query, key_fn, limit)
