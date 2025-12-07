@@ -81,7 +81,7 @@ class LineHelper:
 
         ```python
             cache = MyCache()  # Implements CacheProtocol
-            lines = LineHelper(session, cache=cache).preload()
+            lines = await LineHelper(session, cache=cache).preload()
             metro = await lines.get_by_mode(TransportMode.METRO)
         ```
     """

@@ -1,8 +1,4 @@
-"""Tests for LineHelper.
-
-Note: These tests require the following branches to be merged first:
-- feature/transport-api-endpoints (for get_lines)
-"""
+"""Tests for LineHelper."""
 
 from unittest.mock import AsyncMock, MagicMock
 
@@ -11,21 +7,7 @@ import pytest
 from tsl.helpers import LineHelper, LineInfo
 from tsl.models.common import TransportMode
 
-
-class MockCache:
-    """Mock cache implementation for testing."""
-
-    def __init__(self):
-        self._data = {}
-
-    async def get(self, key: str):
-        return self._data.get(key)
-
-    async def set(self, key: str, value, ttl: int | None = None):
-        self._data[key] = value
-
-    async def delete(self, key: str):
-        self._data.pop(key, None)
+from .fixtures.cache import MockCache
 
 
 class TestLineInfo:
